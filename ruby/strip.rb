@@ -49,7 +49,7 @@ s = " \t \nasdfasd adsf j jjjk j\t  \n  "
 puts "<" + strip1(s) + ">"
 puts "<" + strip2(s) + ">"
 puts "<" + strip3(s) + ">"
-puts s.match(/^\s*(\S*)\s*$/)[4]
+puts "<" + s.strip() + ">"
 puts "----" * 10
 
 
