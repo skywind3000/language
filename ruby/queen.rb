@@ -54,3 +54,6 @@ end
 puts queen1
 puts queen2
 
+
+
+
