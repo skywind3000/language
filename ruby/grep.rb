@@ -4,9 +4,8 @@ def grep(word, filename)
 		number = 0
 		fp.each do |line|
 			number += 1
-			if line.match(word) != nil
-				puts "#{filename}:#{number}: " + line
-			end
+			text = "#{filename}:#{number}: #{line}"
+			puts text if line.match(word) != nil
 		end
 	end
 end
