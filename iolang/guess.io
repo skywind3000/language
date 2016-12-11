@@ -8,8 +8,8 @@ while(true,
 		if (x == key,
 			("Yes you are right, secret key is: " .. (key asString)) println
 			break)
-		if (x < key, "your input is less than secret key" println)
-		if (x > key, "your input is great than secret key" println)
+		if (x < key, "your input is less than secret key" println,
+				"your input is great than secret key" println)
 	 )
 
 
