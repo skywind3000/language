@@ -1,0 +1,3 @@
+fib = Object clone
+
+
