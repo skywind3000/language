@@ -1,7 +1,8 @@
 
 Matrix := List clone
 
-Matrix dim := method(x, y,
+Matrix do (
+	dim := method(x, y,
 		m := Matrix clone
 		z := 0
 		fuck := 3
@@ -13,7 +14,10 @@ Matrix dim := method(x, y,
 		m col := x
 		m)
 
-Matrix rotate := method(
+	get := method(x, y, (self at(y)) at(x))
+	set := method(x, y, z, (self at(y)) atPut(x, z))
+
+	rotate := method(
 		row := self row
 		col := self col
 		m := Matrix dim(self col, self row)
@@ -22,20 +26,19 @@ Matrix rotate := method(
 		m
 		)
 
-Matrix save := method(filename,
-		f := File with(filename)
-		f remove
-		f openForUpdating
+	display := method(
 		row := self row
 		col := self col
+		writeln("Matrix(", col, ", ", row, "):")
 		for (i, 0, row - 1, 
 			for (j, 0, col - 1, 
-				f write(self get(j, i) asString, " "))
-			f write("\n"))
-		f close)
+				write(self get(j, i) asString, " "))
+			write("\n"))
+		writeln()
+		)
+)
 
-Matrix get := method(x, y, (self at(y)) at(x))
-Matrix set := method(x, y, z, (self at(y)) atPut(x, z))
+
 
 m := Matrix dim(4, 4)
 n := Matrix dim(2, 2)
@@ -49,12 +52,7 @@ m set(3, 0, 9)
 n set(1, 0, 99)
 n set(0, 1, 3)
 
-m println
-n println
-m rotate println
-n rotate println
-
-m save("m1.txt")
-m rotate save("m2.txt")
+m display
+m rotate display
 
 

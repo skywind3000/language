@@ -14,6 +14,9 @@ Matrix do (
 		m col := x
 		m)
 
+	get := method(x, y, (self at(y)) at(x))
+	set := method(x, y, z, (self at(y)) atPut(x, z))
+
 	rotate := method(
 		row := self row
 		col := self col
@@ -23,22 +26,43 @@ Matrix do (
 		m
 		)
 
+	display := method(
+		row := self row
+		col := self col
+		writeln("Matrix(", col, ", ", row, "):")
+		for (i, 0, row - 1, 
+			for (j, 0, col - 1, 
+				write(self get(j, i) asString, " "))
+			write("\n"))
+		writeln()
+		)
+
 	save := method(filename,
 		f := File with(filename)
 		f remove
 		f openForUpdating
-		row := self row
-		col := self col
+		f write((self col) asString, "\n")
+		f write((self row) asString, "\n")
+		for (i, 0, (self row) - 1,
+			for (j, 0, (self col) - 1,
+				f write(self get(j, i) asString, "\n")))
+		f close
+		)
+
+	load := method(filename,
+		f := File with(filename)
+		f openForReading
+		col := (f readLine) asNumber
+		row := (f readLine) asNumber
+		m := Matrix dim(col, row)
 		for (i, 0, row - 1, 
-			for (j, 0, col - 1, 
-				f write(self get(j, i) asString, " "))
-			f write("\n"))
-		f close)
+			for (j, 0, col - 1,
+				m set(j, i, f readLine asNumber)))
+		f close
+		m)
 )
 
 
-Matrix get := method(x, y, (self at(y)) at(x))
-Matrix set := method(x, y, z, (self at(y)) atPut(x, z))
 
 m := Matrix dim(4, 4)
 n := Matrix dim(2, 2)
@@ -52,12 +76,10 @@ m set(3, 0, 9)
 n set(1, 0, 99)
 n set(0, 1, 3)
 
-m println
-n println
-m rotate println
-n rotate println
+m display
+m rotate display
+m save("m.txt")
 
-m save("m1.txt")
-m rotate save("m2.txt")
-
+q := Matrix load("m.txt")
+q display
 
