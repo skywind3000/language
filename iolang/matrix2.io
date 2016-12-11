@@ -13,6 +13,14 @@ Matrix dim := method(x, y,
 		m col := x
 		m)
 
+Matrix rotate := method(
+		row := self row
+		col := self col
+		m := Matrix dim(self col, self row)
+		for (j, 0, row - 1,
+			for (i, 0, col - 1, m set(i, j, self get(j, i))))
+		m
+		)
 
 Matrix get := method(x, y, (self at(y)) at(x))
 Matrix set := method(x, y, z, (self at(y)) atPut(x, z))
@@ -31,6 +39,8 @@ n set(0, 1, 3)
 
 m println
 n println
+m rotate println
+n rotate println
 
 
 
