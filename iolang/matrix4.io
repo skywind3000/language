@@ -1,7 +1,5 @@
 
-Matrix := List clone
-
-Matrix do (
+Matrix := List clone do (
 	dim := method(x, y,
 		m := Matrix clone
 		z := 0
