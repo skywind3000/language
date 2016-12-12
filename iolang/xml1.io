@@ -3,8 +3,7 @@ Builder := Object clone
 Builder indent := 0
 
 Builder forward := method(
-		space := self indent
-		for (i, 0, space - 1, write(" "))
+		write(" " repeated(self indent))
 		writeln("<", call message name, ">")
 		self indent = (self indent) + 4
 		call message arguments foreach(
@@ -14,7 +13,7 @@ Builder forward := method(
 				for (i, 0, (self indent) - 1, write(" "))
 				writeln(content)))
 		self indent = (self indent) - 4
-		for (i, 0, space - 1, write(" "))
+		write(" " repeated(self indent))
 		writeln("</", call message name, ">"))
 
 Builder ul(

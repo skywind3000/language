@@ -28,8 +28,7 @@ Builder := Object clone do (
 	indent := 0
 
 	forward := method(
-		space := self indent
-		for (i, 0, space - 1, write(" "))
+		write(" " repeated(self indent))
 		text := ""
 		call message arguments foreach(arg,
 				if (arg name == "curlyBrackets",
@@ -49,7 +48,7 @@ Builder := Object clone do (
 				writeln(content))
 			)
 		self indent = (self indent) - 4
-		for (i, 0, space - 1, write(" "))
+		write(" " repeated(self indent))
 		writeln("</", call message name, ">"))
 )
 
