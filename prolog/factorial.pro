@@ -9,4 +9,8 @@ factorial(N, V) :-
 	N > 3, N1 is N - 1,
 	factorial(N1, V1), V is V1 * N.
 
+factorial(N, V) :-
+	V > 6,
+	factorial(N1, V1), V is V1 * N, N1 is N - 1.
+
 
