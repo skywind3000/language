@@ -1,5 +1,7 @@
-% prolog common lib
-% author: skywind3000@163.com
+% Prolog Common Lib - skywind3000@gmail.com
+%
+% reference: https://www.cpp.edu/~jrfisher/www/prolog_tutorial/2_11.html
+%
 
 car([A|_], A).
 cdr([_|B], B).
