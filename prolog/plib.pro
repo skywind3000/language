@@ -23,3 +23,12 @@ different([HA|LA]) :- exclude(LA,HA), different(LA).
 takeout(X, [X|R], R).
 takeout(X, [F|R], [F|S]) :- takeout(X,R,S).
 
+imp_reverse([], X, X).
+imp_reverse([X|Y], Z, W) :- imp_reverse(Y, [X|Z], W).
+
+reverse(X, Y) :- imp_reverse(X, [], Y).
+
+perm([], []).
+perm([X|Y], Z) :- perm(Y, W), takeout(X, Z, W).
+
+
