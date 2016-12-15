@@ -5,4 +5,8 @@
 
 mirror(Anything) -> Anything.
 
+main(_) ->
+	io:format("Fuck\n"),
+	halt(0).
+
 
