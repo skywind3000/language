@@ -1,6 +1,7 @@
 -module(nano).
 
--export([len/1,  concat/2]).
+-export([len/1, concat/1, concat/2, space/1, alnum/1, reverse/1]).
+-export([lstrip/1, rstrip/1, strip/1]).
 -export([main/1]).
 
 len([]) -> 0;
@@ -9,10 +10,11 @@ len([_|X]) -> 1 + len(X).
 concat([], E) -> E;
 concat([H|T], E) -> [H|concat(T, E)].
 
+concat([]) -> [];
+concat([H|L]) -> concat(H, concat(L)).
+
 reverse([]) -> [];
-reverse([E]) -> [E];
-reverse([A, B]) -> [B, A];
-reverse([H|L]) when length(L) > 1 -> concat(reverse(L), [H]).
+reverse([H|L]) -> concat(reverse(L), [H]).
 
 space(9) -> true;
 space(32) -> true;
