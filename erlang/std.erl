@@ -1,4 +1,4 @@
--module(nano).
+-module(std).
 
 -export([len/1, concat/1, concat/2, space/1, alnum/1, reverse/1]).
 -export([lstrip/1, rstrip/1, strip/1]).
