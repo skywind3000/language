@@ -3,9 +3,9 @@
 -export([main/1]).
 
 
-count(I, N) when I >= N -> 
+count(N, N) ->
 	true;
-count(I, N) when I < N ->
+count(I, N) ->
 	io:format("~w~n", [I]),
 	count(I + 1, N).
 
