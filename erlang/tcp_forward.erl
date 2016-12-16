@@ -12,15 +12,20 @@ listen(DestIp, DestPort, LocalPort) ->
 
 accept(DestIp, DestPort, ListenSocket) ->
 	{ok, Socket} = gen_tcp:accept(ListenSocket),
-	spawn(fun() -> agent(DestIp, DestPort, Socket) end),
+	P = spawn(fun() -> agent(DestIp, DestPort, Socket) end),
+	ok = gen_tcp:controlling_process(Socket, P),
+	% tell agent/3, I have passed over control privilege to you.
+	P ! continue,
 	accept(DestIp, DestPort, ListenSocket).
 
-
-wait() -> wait().
 
 agent(DestIp, DestPort, SrcSocket) ->
 	{ok, DstSocket} = gen_tcp:connect(DestIp, DestPort, ?TCP_OPTIONS),
 	io:format("connection to ~ts:~p established~n", [DestIp, DestPort]),
+	% wait for accept/3 give me the control privilege
+	receive
+		continue -> ok
+	end,
 	P1 = spawn(fun() -> proxy_recv(SrcSocket, DstSocket) end),
 	P2 = spawn(fun() -> proxy_send(SrcSocket, DstSocket) end),
 	io:format("reader/writer pid is ~p/~p ~n", [P1,P2]),
@@ -34,9 +39,8 @@ proxy_recv(SrcSocket, DstSocket) ->
 	proxy_recv(SrcSocket, DstSocket).
 
 proxy_send(SrcSocket, DstSocket) ->
-	P = gen_tcp:recv(DstSocket, 0),
-	io:format("received return: ~p~n", [P]),
-	{ok, Data} = P,
+	{ok, Data} = gen_tcp:recv(DstSocket, 0),
+	io:format("received return: ~p bytes~n", [size(Data)]),
 	ok = gen_tcp:send(SrcSocket, Data),
 	proxy_send(SrcSocket, DstSocket).
 
