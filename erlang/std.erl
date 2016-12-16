@@ -39,8 +39,12 @@ lstrip([H|T]) ->
 rstrip(X) -> reverse(lstrip(reverse(X))).
 strip(X) -> lstrip(rstrip(X)).
 
-repeat([X], 0) -> [];
-repeat([X], N) -> [X|repeat([X], N - 1)].
+repeat_list([X], 0) -> [];
+repeat_list([X], N) -> [X|repeat_list([X], N - 1)].
+
+loop(N, N, Fn) -> true;
+loop(I, N, Fn) when I > N -> true;
+loop(I, N, Fn) -> Fn(I), loop(I + 1, N, Fn).
 
 main(_) ->
 	io:format("~w~n", [len([1,2,3,4])]),
@@ -52,7 +56,8 @@ main(_) ->
 	io:format("lstrip: <~ts>~n", [lstrip("x   asdfasdf df d  ")]),
 	io:format("rstrip: <~ts>~n", [rstrip("   asdfasdf df d  ")]),
 	io:format("strip: <~ts>~n", [strip("   asdfasdf df d  ")]),
-	io:format("repeat: <~ts>~n", [repeat("X", 1)]),
+	io:format("repeat: <~ts>~n", [repeat_list("X", 1)]),
+	loop(1, 10, fun(X) -> io:format("loop: ~w~n", [X]) end),
 	halt(0).
 
 
