@@ -42,8 +42,8 @@ strip(X) -> lstrip(rstrip(X)).
 repeat_list([X], 0) -> [];
 repeat_list([X], N) -> [X|repeat_list([X], N - 1)].
 
-loop(N, N, Fn) -> true;
-loop(I, N, Fn) when I > N -> true;
+loop(N, N, Fn) -> ok;
+loop(I, N, Fn) when I > N -> ok;
 loop(I, N, Fn) -> 
 	case Fn(I) of 
 		break ->
