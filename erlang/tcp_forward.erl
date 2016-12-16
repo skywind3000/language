@@ -1,7 +1,7 @@
 -module(tcp_forward).
 -export([main/1]).
 
--define(TCP_OPTIONS, [binary, {packet, raw}, {active, false}, {reuseaddr, true}, {exit_on_close, false}]).
+-define(TCP_OPTIONS, [binary, {packet, 0}, {active, false}, {reuseaddr, true}, {exit_on_close, false}]).
 
 
 listen(DestIp, DestPort, LocalPort) ->
@@ -21,12 +21,11 @@ wait() -> wait().
 agent(DestIp, DestPort, SrcSocket) ->
 	{ok, DstSocket} = gen_tcp:connect(DestIp, DestPort, ?TCP_OPTIONS),
 	io:format("connection to ~ts:~p established~n", [DestIp, DestPort]),
-	% P1 = spawn(fun() -> proxy_recv(SrcSocket, DstSocket) end),
-	% P2 = spawn(fun() -> proxy_send(SrcSocket, DstSocket) end),
-	% io:format("reader/writer pid is ~p/~p ~n", [P1,P2]),
-	% wait(),
-	spawn(fun() -> proxy_recv(SrcSocket, DstSocket) end),
-	proxy_send(SrcSocket, DstSocket),
+	P1 = spawn(fun() -> proxy_recv(SrcSocket, DstSocket) end),
+	P2 = spawn(fun() -> proxy_send(SrcSocket, DstSocket) end),
+	io:format("reader/writer pid is ~p/~p ~n", [P1,P2]),
+	ok = gen_tcp:controlling_process(DstSocket, P2),
+	ok = gen_tcp:controlling_process(SrcSocket, P1),
 	ok.
 
 proxy_recv(SrcSocket, DstSocket) ->
