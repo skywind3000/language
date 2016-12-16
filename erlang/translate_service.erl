@@ -36,6 +36,7 @@ wait() ->
 
 main(_) ->
 	Translator = spawn(fun () -> loop() end),
+	Translator ! "SomeThing",
 	P1 = translate(Translator, "blanca"),
 	io:format("~p~n", [P1]),
 	P2 = translate(Translator, "casa"),
