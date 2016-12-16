@@ -44,7 +44,14 @@ repeat_list([X], N) -> [X|repeat_list([X], N - 1)].
 
 loop(N, N, Fn) -> true;
 loop(I, N, Fn) when I > N -> true;
-loop(I, N, Fn) -> Fn(I), loop(I + 1, N, Fn).
+loop(I, N, Fn) -> 
+	case Fn(I) of 
+		break ->
+			false;
+		false ->
+			false;
+		_ -> loop(I + 1, N, Fn)
+	end.
 
 main(_) ->
 	io:format("~w~n", [len([1,2,3,4])]),
@@ -57,7 +64,7 @@ main(_) ->
 	io:format("rstrip: <~ts>~n", [rstrip("   asdfasdf df d  ")]),
 	io:format("strip: <~ts>~n", [strip("   asdfasdf df d  ")]),
 	io:format("repeat: <~ts>~n", [repeat_list("X", 1)]),
-	loop(1, 10, fun(X) -> io:format("loop: ~w~n", [X]) end),
+	loop(0, 10, fun(X) -> io:format("loop: ~w~n", [X]), false2 end),
 	halt(0).
 
 
