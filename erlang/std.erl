@@ -13,8 +13,10 @@ concat([H|T], E) -> [H|concat(T, E)].
 concat([]) -> [];
 concat([H|L]) -> concat(H, concat(L)).
 
-reverse([]) -> [];
-reverse([H|L]) -> concat(reverse(L), [H]).
+reverse([], E) -> E;
+reverse([H|L], E) -> reverse(L, [H|E]).
+
+reverse(E) -> reverse(E, []).
 
 space(9) -> true;
 space(32) -> true;
