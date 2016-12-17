@@ -1,2 +1,0 @@
-(println "Hello, Clojure World !!")
-
