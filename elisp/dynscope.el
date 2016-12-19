@@ -4,7 +4,8 @@
 	x))
 
 (defun bar ()
-  (setq x 7))
+  (let ((x 7))
+  (setq x 7)))
 
 (message "x is %d" (foo))
 
