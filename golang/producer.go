@@ -1,7 +1,7 @@
 package main
 
-var cc chan int
-var finish chan int
+var cc = make(chan int)
+var finish = make(chan int)
 
 func worker() {
 	for {
@@ -17,8 +17,6 @@ func worker() {
 }
 
 func main() {
-	cc = make(chan int)
-	finish = make(chan int)
 	go worker()
 	cc <- 20
 	cc <- 30
