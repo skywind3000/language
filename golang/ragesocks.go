@@ -6,6 +6,7 @@ import (
 	"crypto/rc4"
 	"strconv"
 	"net"
+	"io"
 	// "os"
 )
 
@@ -32,6 +33,11 @@ var config = Config {}
 type Protocol struct {
 	crypt_send *rc4.Cipher
 	crypt_recv *rc4.Cipher
+	twice_send *rc4.Cipher
+	twice_recv *rc4.Cipher
+	conn *net.TCPConn
+	esock *net.TCPConn
+	remote_address string
 }
 
 
@@ -125,13 +131,91 @@ func main() {
 			protocol := Protocol {}
 			protocol.crypt_recv, _ = rc4.NewCipher(key)
 			protocol.crypt_send, _ = rc4.NewCipher(key)
+			protocol.twice_recv = nil
+			protocol.twice_send = nil
+			protocol.conn = conn
+			protocol.esock = nil
+			protocol.remote_address = ""
 			if config.run_mode == "server" {
+				protocol.esock = conn
+				go func (protocol *Protocol) {
+					defer protocol.conn.Close()
+					handle_server(protocol)
+				}(&protocol)
 			}	else {
+				go func (protocol *Protocol) {
+					defer protocol.conn.Close()
+					handle_client(protocol)
+				}(&protocol)
 			}
 		}	else {
 			handle_error(err)
 		}
 	}
+}
+
+
+//---------------------------------------------------------------------
+// encryption send
+//---------------------------------------------------------------------
+func encrypt_send(protocol *Protocol, buf []byte) (int, error) {
+	if (protocol.crypt_send != nil) {
+		protocol.crypt_send.XORKeyStream(buf, buf)
+	}
+	if (protocol.twice_send != nil) {
+		protocol.twice_send.XORKeyStream(buf, buf)
+	}
+	return protocol.esock.Write(buf)
+}
+
+
+//---------------------------------------------------------------------
+// encryption recv
+//---------------------------------------------------------------------
+func encrypt_recv(protocol *Protocol, buf []byte) (int, error) {
+	n, err := protocol.esock.Read(buf)
+	if err != nil {
+		return n, err
+	}
+	if (protocol.twice_recv != nil) {
+		protocol.twice_recv.XORKeyStream(buf[:n], buf[:n])
+	}
+	if (protocol.crypt_recv != nil) {
+		protocol.crypt_recv.XORKeyStream(buf[:n], buf[:n])
+	}
+	return n, nil
+}
+
+
+//---------------------------------------------------------------------
+// encryption recv all
+//---------------------------------------------------------------------
+func encrypt_recv_all(protocol *Protocol, buf []byte) (int, error) {
+	n, err := io.ReadFull(protocol.esock, buf)
+	if err != nil {
+		return n, err
+	}
+	if (protocol.twice_recv != nil) {
+		protocol.twice_recv.XORKeyStream(buf, buf)
+	}
+	if (protocol.crypt_recv != nil) {
+		protocol.crypt_recv.XORKeyStream(buf, buf)
+	}
+	return n, err
+}
+
+
+//---------------------------------------------------------------------
+// server entry
+//---------------------------------------------------------------------
+func handle_server(protocol *Protocol) {
+}
+
+
+//---------------------------------------------------------------------
+// client entry
+//---------------------------------------------------------------------
+func handle_client(protocol *Protocol) {
 }
 
 
