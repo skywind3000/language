@@ -332,6 +332,22 @@ func socks5_estab(conn *net.TCPConn) {
 // client entry
 //---------------------------------------------------------------------
 func handle_client(protocol *Protocol) {
+	conn := protocol.conn
+
+	address := socks5_handshake(conn)
+
+	if address == "" {
+		return
+	}
+
+	log.Printf("destination: %s", address)
+
+	client, err := net.Dial("tcp", address)
+	if !handle_error(err) {
+		return
+	}
+
+	protocol.esock = client
 }
 
 
@@ -339,6 +355,7 @@ func handle_client(protocol *Protocol) {
 // server entry
 //---------------------------------------------------------------------
 func handle_server(protocol *Protocol) {
+	conn := protocol.conn
 }
 
 
