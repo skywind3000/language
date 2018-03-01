@@ -1,3 +1,13 @@
+//=====================================================================
+//
+// ragesocks.go - 
+//
+// Created by skywind on 2018/03/01
+// Last Modified: 2018/03/01 23:52:50
+//
+//=====================================================================
+// vim: set ts=4 sw=4 tw=0 noet fdm=indent foldlevel=99 :
+
 package main
 
 import (
@@ -217,6 +227,7 @@ func handle_server(protocol *Protocol) {
 //---------------------------------------------------------------------
 func handle_client(protocol *Protocol) {
 }
+
 
 
 
