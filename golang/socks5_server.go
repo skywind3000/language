@@ -145,10 +145,13 @@ func socks5_handle(conn *net.TCPConn) {
 	defer client.Close()
 	conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 
-	log.Printf("begin transfer")
+	log.Printf("established")
 
-	go io.Copy(conn, client)
+	copy_die := make(chan int)
+	go func () { io.Copy(conn, client); copy_die <- 10 }()
 	io.Copy(client, conn)
+
+	<- copy_die
 
 	log.Print("finish")
 }
