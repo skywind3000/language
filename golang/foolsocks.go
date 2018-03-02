@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
-	// "math/rand"
+	"math/rand"
 	"time"
 	// "os"
 )
@@ -168,6 +168,27 @@ func main() {
 			handle_error(err)
 		}
 	}
+}
+
+
+//---------------------------------------------------------------------
+// random
+//---------------------------------------------------------------------
+func random_string (l int) string {  
+	var result bytes.Buffer  
+	var temp string  
+	randInt := func (min int, max int) int {  
+        rand.Seed( time.Now().UTC().UnixNano())  
+        return min + rand.Intn(max-min)  
+	}  
+	for i:=0 ; i<l ;  {  
+		if string(randInt(65,90))!=temp {  
+			temp = string(randInt(65,90))  
+			result.WriteString(temp)  
+			i++  
+		}  
+	}  
+	return result.String()  
 }
 
 
@@ -401,6 +422,11 @@ func socks5_handshake(conn *net.TCPConn) string {
 		return ""
 	}
 
+	if host == "" {
+		log.Print("ERROR: empty host")
+		return ""
+	}
+
 	conn.SetReadDeadline(time.Time{})
 	port := strconv.Itoa(int(buf[n-2]) * 256 | int(buf[n-1]))
 
@@ -413,6 +439,50 @@ func socks5_handshake(conn *net.TCPConn) string {
 //---------------------------------------------------------------------
 func socks5_estab(conn *net.TCPConn) {
 	conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+	println("suck")
+}
+
+
+//---------------------------------------------------------------------
+// bidirection copy
+//---------------------------------------------------------------------
+func encrypt_copy(protocol *Protocol) {
+	const BUF_SIZE int = 32768
+	ch := make(chan int)
+	go func () {
+		buf := make([]byte, BUF_SIZE)
+		for {
+			n, err := encrypt_recv(protocol, buf[:BUF_SIZE])
+			if err != nil {
+				n, err = protocol.conn.Write(buf[:n])
+				if err != nil {
+					break
+				}
+			}	else {
+				break
+			}
+		}
+		ch <- 1
+	}()
+	go func () {
+		buf := make([]byte, BUF_SIZE)
+		println("fuck1")
+		for {
+			n, err := protocol.conn.Read(buf)
+			if err != nil {
+				println("recv", n, "bytes")
+				n, err = encrypt_send(protocol, buf[:n])
+				if err != nil {
+					break
+				}
+			}	else {
+				break
+			}
+		}
+		ch <- 2
+	}()
+	<- ch
+	<- ch
 }
 
 
@@ -446,8 +516,10 @@ func handle_client(protocol *Protocol) {
 	defer client.Close()
 
 	m := map[string]string {}
+	m["random"] = random_string(12)
 	m["destination"] = address
 	m["name"] = "foolsocks"
+	m["secret"] = random_string(10)
 
 	_, err = encrypt_send_gob(protocol, m)
 
@@ -461,7 +533,22 @@ func handle_client(protocol *Protocol) {
 		return
 	}
 
-	log.Printf("reply=%s", r["name"])
+	if r["status"] != "ok" {
+		log.Printf("status is not ok")
+		return
+	}
+
+	socks5_estab(protocol.conn)
+
+	secret := m["secret"] + r["secret"]
+	rc4key := []byte(secret)
+	protocol.twice_recv, _ = rc4.NewCipher(rc4key)
+	protocol.twice_send, _ = rc4.NewCipher(rc4key)
+
+	log.Printf("established from %s to %s", 
+		protocol.conn.RemoteAddr().String(), address)
+
+	encrypt_copy(protocol)
 }
 
 
@@ -475,18 +562,49 @@ func handle_server(protocol *Protocol) {
 		return
 	}
 
+	address := m["destination"]
 
-	log.Printf("name=%s", m["name"])
+	if address == "" {
+		log.Printf("handle_server: empty destination")
+		return
+	}
+
+	remote, err := net.ResolveTCPAddr("tcp", address)
+	if !handle_error(err) {
+		return
+	}
+
+	log.Printf("destination=%s", m["destination"])
+
+	client, err := net.DialTCP("tcp", nil, remote)
+	if !handle_error(err) {
+		return
+	}
+
+	protocol.conn = client
+	defer client.Close()
 
 	r := map[string]string {}
 	r["name"] = "server"
+	r["remote"] = client.RemoteAddr().String()
 	r["status"] = "ok"
+	r["secret"] = random_string(10)
 
 	_, err = encrypt_send_gob(protocol, r)
 
 	if !handle_error(err) {
 		return
 	}
+
+	log.Printf("established from %s to %s", 
+		protocol.esock.RemoteAddr().String(), address)
+
+	secret := m["secret"] + r["secret"]
+	rc4key := []byte(secret)
+	protocol.twice_recv, _ = rc4.NewCipher(rc4key)
+	protocol.twice_send, _ = rc4.NewCipher(rc4key)
+
+	encrypt_copy(protocol)
 }
 
 
