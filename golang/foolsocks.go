@@ -466,9 +466,10 @@ func encrypt_copy(protocol *Protocol) {
 	}()
 	go func () {
 		buf := make([]byte, BUF_SIZE)
-		println("fuck1")
 		for {
+			println("fuck1")
 			n, err := protocol.conn.Read(buf)
+			println("fuck2")
 			if err != nil {
 				println("recv", n, "bytes")
 				n, err = encrypt_send(protocol, buf[:n])
