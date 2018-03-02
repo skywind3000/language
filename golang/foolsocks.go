@@ -17,6 +17,11 @@ import (
 	"strconv"
 	"net"
 	"io"
+	"bytes"
+	"encoding/gob"
+	"errors"
+	// "math/rand"
+	"time"
 	// "os"
 )
 
@@ -137,6 +142,7 @@ func main() {
 	for {
 		conn, err := listener.AcceptTCP()
 		if err == nil {
+			log.Printf("new connection: %s", conn.RemoteAddr().String())
 			key := []byte(config.key)
 			protocol := Protocol {}
 			protocol.crypt_recv, _ = rc4.NewCipher(key)
@@ -216,13 +222,95 @@ func encrypt_recv_all(protocol *Protocol, buf []byte) (int, error) {
 
 
 //---------------------------------------------------------------------
+// gob - send
+//---------------------------------------------------------------------
+func encrypt_send_gob(protocol *Protocol, m map[string]string) (int, error) {
+	var bb bytes.Buffer
+	enc := gob.NewEncoder(&bb)
+	enc.Encode(m)
+	buf := bb.Bytes()
+	size := len(buf)
+	if size >= 32767 {
+		return 0, errors.New("size exceed 0x7fff")
+	}
+	header := [2]byte {}
+	header[0] = byte(size & 0xff);
+	header[1] = byte(size / 256);
+
+	n, err := encrypt_send(protocol, header[:2])
+	if err != nil {
+		return n, err
+	}
+
+	if n != 2 {
+		return 0, errors.New("can not send enough data")
+	}
+
+	n, err = encrypt_send(protocol, buf[:size])
+
+	return n, err
+}
+
+
+//---------------------------------------------------------------------
+// gob - receive
+//---------------------------------------------------------------------
+func encrypt_recv_gob(protocol *Protocol) (map[string]string, error) {
+	conn := protocol.esock
+	conn.SetReadDeadline(time.Now().Add(time.Second * 10))
+
+	header := [2]byte {}
+	n, err := encrypt_recv_all(protocol, header[:2])
+	if err != nil {
+		return nil, err
+	}
+
+	if n != 2 {
+		return nil, errors.New("encrypt_recv_gob: size error")
+	}
+
+	var size int
+	size = int(header[1]) * 256 + int(header[0])
+
+	if size < 1 {
+		return nil, errors.New("encrypt_recv_gob: invalid header size")
+	}
+
+	buf := make([]byte, size)
+
+	n, err = encrypt_recv_all(protocol, buf[:size])
+
+	if err != nil {
+		return nil, err
+	}
+
+	if n != size {
+		return nil, errors.New("encrypt_recv_gob: invalid body size")
+	}
+
+	conn.SetReadDeadline(time.Time{})
+
+	dec := gob.NewDecoder(bytes.NewBuffer(buf))
+	var m map[string]string
+
+	err = dec.Decode(&m)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+
+//---------------------------------------------------------------------
 // socks5 hand shake
 //---------------------------------------------------------------------
 func socks5_handshake(conn *net.TCPConn) string {
 	buf := [512]byte {}
 	conn.SetReadDeadline(time.Now().Add(time.Second * 10))
 	n, err := io.ReadFull(conn, buf[:2])
-	if !handleError(err) {
+	if !handle_error(err) {
 		return ""
 	}
 	if n != 2 || n <= 0 {
@@ -244,7 +332,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 
 	n, err = io.ReadFull(conn, buf[:4])
 
-	if !handleError(err) {
+	if !handle_error(err) {
 		return ""
 	}
 
@@ -268,7 +356,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 	switch buf[3] {
 	case 1:
 		n, err = io.ReadFull(conn, buf[:6])
-		if !handleError(err) {
+		if !handle_error(err) {
 			return ""
 		}
 		if n != 6 {
@@ -278,7 +366,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 		host = net.IPv4(buf[0],buf[1],buf[2],buf[3]).String()
 	case 3:
 		n, err = io.ReadFull(conn, buf[:1])
-		if !handleError(err) {
+		if !handle_error(err) {
 			return ""
 		}
 		if n != 1 {
@@ -287,7 +375,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 		}
 		size := int(buf[0])
 		n, err = io.ReadFull(conn, buf[:size + 2])
-		if !handleError(err) {
+		if !handle_error(err) {
 			return ""
 		}
 		if n != size + 2 {
@@ -298,7 +386,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 		// log.Printf("host2 is %s size is %d", host, size)
 	case 4:
 		n, err = io.ReadFull(conn, buf[:18])
-		if !handleError(err) {
+		if !handle_error(err) {
 			return ""
 		}
 		if n != 18 {
@@ -342,12 +430,38 @@ func handle_client(protocol *Protocol) {
 
 	log.Printf("destination: %s", address)
 
-	client, err := net.Dial("tcp", address)
+	endpoint := config.server_host + ":" + strconv.Itoa(config.server_port)
+	remote, err := net.ResolveTCPAddr("tcp", endpoint)
+
+	if !handle_error(err) {
+		return
+	}
+
+	client, err := net.DialTCP("tcp", nil, remote)
 	if !handle_error(err) {
 		return
 	}
 
 	protocol.esock = client
+	defer client.Close()
+
+	m := map[string]string {}
+	m["destination"] = address
+	m["name"] = "foolsocks"
+
+	_, err = encrypt_send_gob(protocol, m)
+
+	if !handle_error(err) {
+		return
+	}
+
+	r, err := encrypt_recv_gob(protocol)
+
+	if !handle_error(err) {
+		return
+	}
+
+	log.Printf("reply=%s", r["name"])
 }
 
 
@@ -355,7 +469,24 @@ func handle_client(protocol *Protocol) {
 // server entry
 //---------------------------------------------------------------------
 func handle_server(protocol *Protocol) {
-	conn := protocol.conn
+	// conn := protocol.conn
+	m, err := encrypt_recv_gob(protocol)
+	if !handle_error(err) {
+		return
+	}
+
+
+	log.Printf("name=%s", m["name"])
+
+	r := map[string]string {}
+	r["name"] = "server"
+	r["status"] = "ok"
+
+	_, err = encrypt_send_gob(protocol, r)
+
+	if !handle_error(err) {
+		return
+	}
 }
 
 
