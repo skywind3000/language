@@ -278,7 +278,7 @@ func encrypt_send_gob(protocol *Protocol, m map[string]string) (int, error) {
 //---------------------------------------------------------------------
 func encrypt_recv_gob(protocol *Protocol) (map[string]string, error) {
 	conn := protocol.esock
-	conn.SetReadDeadline(time.Now().Add(time.Second * 10))
+	conn.SetReadDeadline(time.Now().Add(time.Second * 20))
 
 	header := [2]byte {}
 	n, err := encrypt_recv_all(protocol, header[:2])
