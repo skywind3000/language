@@ -1,9 +1,9 @@
 //=====================================================================
 //
-// foolsocks.go - 
+// foolsocks.go - Simple SS Alternative
 //
 // Created by skywind on 2018/03/01
-// Last Modified: 2018/03/01 23:52:50
+// Last Modified: 2018/03/02 23:49
 //
 //=====================================================================
 // vim: set ts=4 sw=4 tw=0 noet fdm=indent foldlevel=99 :
@@ -22,6 +22,9 @@ import (
 	"errors"
 	"math/rand"
 	"time"
+	"crypto/sha1"
+	"fmt"
+	"strings"
 	// "os"
 )
 
@@ -517,6 +520,7 @@ func handle_client(protocol *Protocol) {
 	m["destination"] = address
 	m["name"] = "foolsocks"
 	m["secret"] = random_string(10)
+	m["signature"] = signature_sign(config.key)
 
 	_, err = encrypt_send_gob(protocol, m)
 
@@ -546,6 +550,7 @@ func handle_client(protocol *Protocol) {
 		protocol.conn.RemoteAddr().String(), address)
 
 	encrypt_copy(protocol)
+	log.Printf("end transport")
 }
 
 
@@ -563,6 +568,13 @@ func handle_server(protocol *Protocol) {
 
 	if address == "" {
 		log.Printf("handle_server: empty destination")
+		return
+	}
+
+	signature := m["signature"]
+
+	if !signature_check(config.key, signature) {
+		log.Printf("signature check failed")
 		return
 	}
 
@@ -605,7 +617,61 @@ func handle_server(protocol *Protocol) {
 }
 
 
+//---------------------------------------------------------------------
+// md5_sign
+//---------------------------------------------------------------------
+func md5_sign(ts int64, key string) string {
+	token := strconv.FormatInt(ts, 10) + ":" + key
+	sum := sha1.Sum([]byte(token))
+	str := fmt.Sprintf("%x", sum)
+	str = strconv.FormatInt(ts, 10) + "i" + str
+	return str
+}
 
 
+//---------------------------------------------------------------------
+// md5_check
+//---------------------------------------------------------------------
+func md5_check(ts int64, key string, sign string, diff int64) bool {
+	pos := strings.Index(sign, "i")
+	if pos < 0 {
+		return false
+	}
+	timestamp := sign[:pos]
+	tt, err := strconv.ParseInt(timestamp, 10, 64)
+	if err != nil {
+		return false
+	}
+	delta := ts - tt
+	if delta < 0 {
+		delta = -delta
+	}
+	if delta > diff {
+		return false
+	}
+	test := md5_sign(tt, key)
+	if test != sign {
+		return false
+	}
+	return true
+}
+
+
+//---------------------------------------------------------------------
+// make md5 signature from current timestamp and key
+//---------------------------------------------------------------------
+func signature_sign(key string) string {
+	ts := time.Now().Unix()
+	return md5_sign(ts, key)
+}
+
+
+//---------------------------------------------------------------------
+// check signature with current timestamp and key
+//---------------------------------------------------------------------
+func signature_check(key string, sign string) bool {
+	ts := time.Now().Unix()
+	return md5_check(ts, key, sign, 600)
+}
 
 
