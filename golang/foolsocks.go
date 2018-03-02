@@ -439,7 +439,6 @@ func socks5_handshake(conn *net.TCPConn) string {
 //---------------------------------------------------------------------
 func socks5_estab(conn *net.TCPConn) {
 	conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
-	println("suck")
 }
 
 
