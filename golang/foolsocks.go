@@ -507,7 +507,7 @@ func handle_client(protocol *Protocol) {
 	log.Printf("destination: %s", address)
 
 	endpoint := config.server_host + ":" + strconv.Itoa(config.server_port)
-	remote, err := net.ResolveTCPAddr("tcp", endpoint)
+	remote, err := net.ResolveTCPAddr("tcp4", endpoint)
 
 	if !handle_error(err) {
 		return
@@ -591,7 +591,7 @@ func handle_server(protocol *Protocol) {
 
 	log.Printf("destination=%s", m["destination"])
 
-	client, err := net.DialTCP("tcp", nil, remote)
+	client, err := net.DialTCP("tcp4", nil, remote)
 	if !handle_error(err) {
 		return
 	}
