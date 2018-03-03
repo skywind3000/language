@@ -65,7 +65,7 @@ type Protocol struct {
 func arguments_init() bool {
 	server := flag.Bool("server", false, "Running mode")
 	server_host := flag.String("s", "", "Server address")
-	client_host := flag.String("b", "", "Local address")
+	client_host := flag.String("b", "", "Client address")
 	server_port := flag.Int("p", 1030, "Server port")
 	client_port := flag.Int("l", 1030, "Client port")
 	method := flag.String("m", "rc4", "Encryption method")
@@ -461,6 +461,9 @@ func encrypt_copy(protocol *Protocol) {
 					break
 				}
 			}	else {
+				if err == nil {
+					log.Printf("ERROR: Fatal recv zero")
+				}
 				break
 			}
 		}
@@ -476,6 +479,9 @@ func encrypt_copy(protocol *Protocol) {
 					break
 				}
 			}	else {
+				if err == nil {
+					log.Printf("ERROR: Fatal recv zero")
+				}
 				break
 			}
 		}
