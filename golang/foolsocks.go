@@ -513,7 +513,7 @@ func handle_client(protocol *Protocol) {
 		return
 	}
 
-	client, err := net.DialTCP("tcp", nil, remote)
+	client, err := net.DialTCP("tcp4", nil, remote)
 	if !handle_error(err) {
 		return
 	}
@@ -584,7 +584,7 @@ func handle_server(protocol *Protocol) {
 		return
 	}
 
-	remote, err := net.ResolveTCPAddr("tcp", address)
+	remote, err := net.ResolveTCPAddr("tcp4", address)
 	if !handle_error(err) {
 		return
 	}
