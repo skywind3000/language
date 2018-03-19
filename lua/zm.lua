@@ -27,6 +27,7 @@ module('zlua')
 -- Global Variable
 -----------------------------------------------------------------------
 local MAX_AGE = 5000
+local DATA_FILE = '~/.fasd'
 
 
 -----------------------------------------------------------------------
@@ -158,11 +159,60 @@ end
 
 
 -----------------------------------------------------------------------
+-- check subdir
+-----------------------------------------------------------------------
+function path_subdir(basename, subname)
+	if windows then
+		basename = basename:gsub('\\', '/')
+		subname = subname:gsub('\\', '/')
+		basename = basename:lower()
+		subname = subname:lower()
+	end
+	local last = basename:sub(-1, -1)
+	if last ~= '/' then
+		basename = basename .. '/'
+	end
+	if subname:find(basename, 0, true) == 1 then
+		return true
+	end
+	return false
+end
+
+
+-----------------------------------------------------------------------
+-- expand user home
+-----------------------------------------------------------------------
+function path_expand(pathname)
+	if not pathname:find('~') then
+		return pathname
+	end
+	local home = ''
+	if windows then
+		home = os.getenv('USERPROFILE')
+	else
+		home = os.getenv('HOME')
+	end
+	if pathname == '~' then
+		return home
+	end
+	local head = pathname:sub(1, 2)
+	if windows then
+		if head == '~/' or head == '~\\' then
+			return home .. '\\' .. pathname:sub(3, -1)
+		end
+	elseif head == '~/' then
+		return home .. '/' .. pathname:sub(3, -1)
+	end
+	return pathname
+end
+
+
+-----------------------------------------------------------------------
 -- load and split data
 -----------------------------------------------------------------------
 function data_load(filename)
 	local M = {}
-	fp = io.open(filename, 'r')
+	fp = io.open(path_expand(filename), 'r')
 	if fp == nil then
 		return nil
 	end
@@ -193,6 +243,7 @@ function data_save(filename, M)
 	local fp = nil
 	local tmpname = nil
 	local i
+	filename = path_expand(filename)
 	if windows then
 		fp = io.open(filename, 'w')
 	else
@@ -261,14 +312,14 @@ function data_insert(M, filename)
 			if name == item.name then
 				item.rank = item.rank + 1
 				item.time = current
-				find = 1
+				find = true
 				break
 			end
 		else
 			if key == string.lower(item.name) then
 				item.rank = item.rank + 1
 				item.time = current
-				find = 1
+				find = true
 				break
 			end
 		end
@@ -325,13 +376,13 @@ end
 -----------------------------------------------------------------------
 -- select available paths
 -----------------------------------------------------------------------
-function data_select(M, patterns, nocase)
+function data_select(M, patterns)
 	local N = {}
 	local i = 1
 	local pats = {}
 	for i = 1, #patterns do
 		local p = patterns[i]
-		if not nocase then
+		if not windows then
 			table.insert(pats, p)
 		else
 			table.insert(pats, case_insensitive_pattern(p))
@@ -371,6 +422,17 @@ end
 
 
 -----------------------------------------------------------------------
+-- add path
+-----------------------------------------------------------------------
+function z_add(path)
+	if not path_isdir(path) then
+		return false
+	end
+
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
 local inname = windows and 'c:/users/linwei/.fasd' or '/cygdrive/c/users/linwei/.fasd'
@@ -388,5 +450,6 @@ p = 'd:/dev/python27/lib/site-packages'
 print(path_match(p, {'lib', 'site'}))
 
 printT(data_select(x, {'i', 'c'}, true))
-
+print(path_subdir('d:\\Dev', p))
+print(path_expand('d:/dev'))
 
