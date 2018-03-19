@@ -6,6 +6,7 @@
 -- Last Modified: 2018/03/19 11:11:47
 --
 --=====================================================================
+
 local string = string
 local table = table
 local io = io
@@ -14,6 +15,8 @@ local assert = assert
 local type = type
 local pairs = pairs
 local tostring = tostring
+local tonumber = tonumber
+
 module('zlua')
 
 
@@ -98,19 +101,29 @@ end
 -- load and split data
 -----------------------------------------------------------------------
 function data_load(filename)
+	local M = {}
 	for line in io.lines(filename) do
-		local p1 = string.find(line, '|')
-		-- print(p1)
+		local part = string.split(line, '|')
+		local item = {}
+		if part and part[1] and part[2] and part[3] then
+			item.name = part[1]
+			item.rank = tonumber(part[2])
+			item.time = tonumber(part[3]) + 0
+			if string.len(part[3]) < 12 then
+				table.insert(M, item)
+			end
+		end
 	end
+	return M
 end
 
 
 -----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
-data_load('c:/users/linwei/.fasd')
+local x = data_load('c:/users/linwei/.fasd')
 local t = '123|aa|bb|cc||dd|'
-local r = string.split(t, '|')
+local r = string.split(t, '/')
 
-printT(r)
+printT(x)
 
