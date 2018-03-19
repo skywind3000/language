@@ -138,8 +138,11 @@ function data_load(filename)
 			item.name = part[1]
 			item.rank = tonumber(part[2])
 			item.time = tonumber(part[3]) + 0
+			item.score = item.rank
 			if string.len(part[3]) < 12 then
-				table.insert(M, item)
+				if item.rank ~= nil and item.time ~= nil then
+					table.insert(M, item)
+				end
 			end
 		end
 	end
@@ -212,7 +215,6 @@ function data_insert(M, filename)
 				table.insert(X, item)
 			end
 		end
-		M = X
 	end
 	local name = filename
 	local key = windows and string.lower(name) or name
@@ -241,6 +243,7 @@ function data_insert(M, filename)
 		item.name = name
 		item.rank = 1
 		item.time = current
+		item.score = item.rank
 		table.insert(M, item)
 	end
 	return M
