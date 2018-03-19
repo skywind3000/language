@@ -24,6 +24,12 @@ module('zlua')
 
 
 -----------------------------------------------------------------------
+-- Global Variable
+-----------------------------------------------------------------------
+local MAX_AGE = 5000
+
+
+-----------------------------------------------------------------------
 -- split string
 -----------------------------------------------------------------------
 function string:split(sSeparator, nMax, bRegexp)
@@ -121,7 +127,11 @@ end
 -----------------------------------------------------------------------
 function data_load(filename)
 	local M = {}
-	for line in io.lines(filename) do
+	fp = io.open(filename, 'r')
+	if fp == nil then
+		return nil
+	end
+	for line in fp:lines() do
 		local part = string.split(line, '|')
 		local item = {}
 		if part and part[1] and part[2] and part[3] then
@@ -133,6 +143,7 @@ function data_load(filename)
 			end
 		end
 	end
+	fp:close()
 	return M
 end
 
@@ -143,26 +154,26 @@ end
 function data_save(filename, M)
 	local fp = nil
 	local tmpname = nil
+	local i
 	if windows then
 		fp = io.open(filename, 'w')
 	else
 		tmpname = os.tmpname()
 		fp = io.open(tmpname, 'w')
 	end
-	local i = 1
-	while true do
+	if fp == nil then
+		return false
+	end
+	for i = 1, #M do
 		local item = M[i]
-		if item == nil then
-			break
-		end
 		local text = item.name .. '|' .. item.rank .. '|' .. item.time
 		fp:write(text .. '\n')
-		i = i + 1
 	end
 	fp:close()
 	if tmpname ~= nil then
 		os.rename(tmpname, filename)
 	end
+	return true
 end
 
 
@@ -171,12 +182,9 @@ end
 -----------------------------------------------------------------------
 function data_filter(M)
 	local N = {}
-	local i = 1
-	while true do
+	local i
+	for i = 1, #M do
 		local item = M[i]
-		if item == nil then 
-			break
-		end
 		if isdir(item.name) then
 			table.insert(N, item)
 		end
@@ -186,11 +194,67 @@ end
 
 
 -----------------------------------------------------------------------
+-- insert item
+-----------------------------------------------------------------------
+function data_insert(M, filename)
+	local i = 1
+	local sumscore = 0
+	for i = 1, #M do 
+		local item = M[i]
+		sumscore = sumscore + item.rank
+	end
+	if sumscore >= MAX_AGE then
+		local X = {}
+		for i = 1, #M do
+			local item = M[i]
+			item.rank = item.rank * 0.9
+			if item.rank >= 1.0 then
+				table.insert(X, item)
+			end
+		end
+		M = X
+	end
+	local name = filename
+	local key = windows and string.lower(name) or name
+	local find = false
+	local current = os.time()
+	for i = 1, #M do
+		local item = M[i]
+		if not windows then
+			if name == item.name then
+				item.rank = item.rank + 1
+				item.time = current
+				find = 1
+				break
+			end
+		else
+			if key == string.lower(item.name) then
+				item.rank = item.rank + 1
+				item.time = current
+				find = 1
+				break
+			end
+		end
+	end
+	if not find then
+		local item = {}
+		item.name = name
+		item.rank = 1
+		item.time = current
+		table.insert(M, item)
+	end
+	return M
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
 local inname = windows and 'c:/users/linwei/.fasd' or '/cygdrive/c/users/linwei/.fasd'
 local outname = windows and 'd:/fasd.txt' or '/cygdrive/d/fasd.txt'
 local x = data_load(inname)
+x = data_filter(x)
+x = data_insert(x, 'd:/software')
 printT(x)
 data_save(outname, x)
 
