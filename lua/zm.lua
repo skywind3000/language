@@ -10,12 +10,15 @@
 local string = string
 local table = table
 local io = io
+local os = os
+local package = package
 local print = print
 local assert = assert
 local type = type
 local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
+local windows = package.config:sub(1, 1) ~= '/' and true or false
 
 module('zlua')
 
@@ -98,6 +101,22 @@ end
 
 
 -----------------------------------------------------------------------
+-- dir exists
+-----------------------------------------------------------------------
+function isdir(pathname)
+	local name = pathname .. '/'
+	local ok, err, code = os.rename(name, name)
+	if not ok then
+		if code == 13 then
+			return true
+		end
+		return false
+	end
+	return true
+end
+
+
+-----------------------------------------------------------------------
 -- load and split data
 -----------------------------------------------------------------------
 function data_load(filename)
@@ -119,11 +138,60 @@ end
 
 
 -----------------------------------------------------------------------
+-- save data
+-----------------------------------------------------------------------
+function data_save(filename, M)
+	local fp = nil
+	local tmpname = nil
+	if windows then
+		fp = io.open(filename, 'w')
+	else
+		tmpname = os.tmpname()
+		fp = io.open(tmpname, 'w')
+	end
+	local i = 1
+	while true do
+		local item = M[i]
+		if item == nil then
+			break
+		end
+		local text = item.name .. '|' .. item.rank .. '|' .. item.time
+		fp:write(text .. '\n')
+		i = i + 1
+	end
+	fp:close()
+	if tmpname ~= nil then
+		os.rename(tmpname, filename)
+	end
+end
+
+
+-----------------------------------------------------------------------
+-- filter out bad dirname
+-----------------------------------------------------------------------
+function data_filter(M)
+	local N = {}
+	local i = 1
+	while true do
+		local item = M[i]
+		if item == nil then 
+			break
+		end
+		if isdir(item.name) then
+			table.insert(N, item)
+		end
+	end
+	return N
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
-local x = data_load('c:/users/linwei/.fasd')
-local t = '123|aa|bb|cc||dd|'
-local r = string.split(t, '/')
-
+local inname = windows and 'c:/users/linwei/.fasd' or '/cygdrive/c/users/linwei/.fasd'
+local outname = windows and 'd:/fasd.txt' or '/cygdrive/d/fasd.txt'
+local x = data_load(inname)
 printT(x)
+data_save(outname, x)
 
+print(isdir('c:/windows'))
