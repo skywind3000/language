@@ -173,7 +173,7 @@ function data_load(filename)
 			item.name = part[1]
 			item.rank = tonumber(part[2])
 			item.time = tonumber(part[3]) + 0
-			item.score = item.rank
+			item.frecent = item.rank
 			if string.len(part[3]) < 12 then
 				if item.rank ~= nil and item.time ~= nil then
 					table.insert(M, item)
@@ -278,7 +278,7 @@ function data_insert(M, filename)
 		item.name = name
 		item.rank = 1
 		item.time = current
-		item.score = item.rank
+		item.frecent = item.rank
 		table.insert(M, item)
 	end
 	return M
@@ -344,6 +344,29 @@ function data_select(M, patterns, nocase)
 		end
 	end
 	return N
+end
+
+
+-----------------------------------------------------------------------
+-- update frecent
+-----------------------------------------------------------------------
+function data_update_frecent(M)
+	local current = os.time()
+	local i
+	for i = 1, #M do
+		local item = M[i]
+		local dx = current - item.time
+		if dx < 3600 then 
+			item.frecent = item.rank * 4
+		elseif dx < 86400 then
+			item.frecent = item.rank * 2
+		elseif dx < 604800 then
+			item.frecent = item.rank * 0.5
+		else
+			item.frecent = item.rank * 0.25
+		end
+	end
+	return M
 end
 
 
