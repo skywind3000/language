@@ -286,10 +286,30 @@ end
 
 
 -----------------------------------------------------------------------
+-- change pattern
+-----------------------------------------------------------------------
+function case_insensitive_pattern(pattern)
+	-- find an optional '%' (group 1) followed by any character (group 2)
+	local p = pattern:gsub("(%%?)(.)", function(percent, letter)
+
+		if percent ~= "" or not letter:match("%a") then
+			-- if the '%' matched, or `letter` is not a letter, return "as is"
+			return percent .. letter
+		else
+			-- else, return a case-insensitive character class of the matched letter
+			return string.format("[%s%s]", letter:lower(), letter:upper())
+		end
+	end)
+	return p
+end
+
+
+-----------------------------------------------------------------------
 -- pathmatch
 -----------------------------------------------------------------------
 function path_match(pathname, patterns)
 	local pos = 1
+	local i = 0
 	for i = 1, #patterns do
 		local pat = patterns[i]
 		start, endup = pathname:find(pat, pos)
@@ -299,6 +319,31 @@ function path_match(pathname, patterns)
 		pos = endup + 1
 	end
 	return true
+end
+
+
+-----------------------------------------------------------------------
+-- select available paths
+-----------------------------------------------------------------------
+function data_select(M, patterns, nocase)
+	local N = {}
+	local i = 1
+	local pats = {}
+	for i = 1, #patterns do
+		local p = patterns[i]
+		if not nocase then
+			table.insert(pats, p)
+		else
+			table.insert(pats, case_insensitive_pattern(p))
+		end
+	end
+	for i = 1, #M do
+		local item = M[i]
+		if path_match(item.name, pats) then
+			table.insert(N, item)
+		end
+	end
+	return N
 end
 
 
@@ -318,5 +363,7 @@ print('---------')
 p = 'd:/dev/python27/lib/site-packages'
 
 print(path_match(p, {'lib', 'site'}))
+
+printT(data_select(x, {'i', 'c'}, true))
 
 
