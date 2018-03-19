@@ -109,7 +109,7 @@ end
 -----------------------------------------------------------------------
 -- dir exists
 -----------------------------------------------------------------------
-function isdir(pathname)
+function path_isdir(pathname)
 	local name = pathname .. '/'
 	local ok, err, code = os.rename(name, name)
 	if not ok then
@@ -119,6 +119,41 @@ function isdir(pathname)
 		return false
 	end
 	return true
+end
+
+
+-----------------------------------------------------------------------
+-- is absolute path
+-----------------------------------------------------------------------
+function path_isabs(pathname)
+	local h1 = pathname:sub(1, 1)
+	if windows then
+		local h2 = pathname:sub(2, 2)
+		local h3 = pathname:sub(3, 3)
+		if h1 == '/' or h1 == '\\' then
+			return true
+		end
+		if h2 == ':' and (h3 == '/' or h3 == '\\') then
+			return true
+		end
+	elseif h1 == '/' then
+		return true
+	end
+	return false
+end
+
+
+-----------------------------------------------------------------------
+-- normalize path
+-----------------------------------------------------------------------
+function path_norm(pathname)
+	if windows then 
+		pathname = pathname:gsub('\\', '/')
+	end
+	if windows then
+		pathname = pathname:gsub('/', '\\')
+	end
+	return pathname
 end
 
 
@@ -188,7 +223,7 @@ function data_filter(M)
 	local i
 	for i = 1, #M do
 		local item = M[i]
-		if isdir(item.name) then
+		if path_isdir(item.name) then
 			table.insert(N, item)
 		end
 	end
@@ -251,6 +286,23 @@ end
 
 
 -----------------------------------------------------------------------
+-- pathmatch
+-----------------------------------------------------------------------
+function path_match(pathname, patterns)
+	local pos = 1
+	for i = 1, #patterns do
+		local pat = patterns[i]
+		start, endup = pathname:find(pat, pos)
+		if start == nil or endup == nil then
+			return false
+		end
+		pos = endup + 1
+	end
+	return true
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
 local inname = windows and 'c:/users/linwei/.fasd' or '/cygdrive/c/users/linwei/.fasd'
@@ -261,4 +313,10 @@ x = data_insert(x, 'd:/software')
 printT(x)
 data_save(outname, x)
 
-print(isdir('c:/windows'))
+print(path_isdir('c:/windows'))
+print('---------')
+p = 'd:/dev/python27/lib/site-packages'
+
+print(path_match(p, {'lib', 'site'}))
+
+
