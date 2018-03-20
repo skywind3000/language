@@ -30,6 +30,7 @@ end
 local windows = package.config:sub(1, 1) ~= '/' and true or false
 local in_module = pcall(debug.getlocal, 4, 1) and true or false
 os.path = {}
+os.argv = arg ~= nil and arg or {}
 
 
 -----------------------------------------------------------------------
@@ -363,6 +364,38 @@ function os.scriptname()
 	end
 	local script = arg[0]
 	return os.path.abspath(script)
+end
+
+
+-----------------------------------------------------------------------
+-- parse option
+-----------------------------------------------------------------------
+function os.getopt(argv)
+	local args = {}
+	local options = {}
+	argv = argv ~= nil and argv or os.argv
+	if argv == nil then
+		return nil, nil
+	elseif (#argv) == 0 then
+		return options, args
+	end
+	local count = #argv
+	local index = 1
+	while index <= count do
+		local arg = argv[index]
+		local head = arg:sub(1, 1)
+		if head ~= '-' then
+			break
+		end
+		index = index + 1
+		local part = arg:split('=')
+		options[part[1]] = part[2] ~= nil and part[2] or ''
+	end
+	while index <= count do
+		table.insert(args, argv[index])
+		index = index + 1
+	end
+	return options, args
 end
 
 
@@ -722,11 +755,28 @@ function z_cd(patterns)
 end
 
 
+
+
 -----------------------------------------------------------------------
 -- main entry
 -----------------------------------------------------------------------
-function main()
-	print('fuck')
+function main(argv)
+	local options, args = os.getopt(argv)
+	if options == nil then
+		return false
+	elseif (#args) == 0 then
+		print(os.argv[0] .. ': missing arguments')
+		help = os.argv[-1] .. ' ' .. os.argv[0] .. ' --help'
+		print('Try \'' .. help .. '\' for more information')
+		return false
+	end
+	if true then
+		print("options: ")
+		printT(options)
+		print("args: ")
+		printT(args)
+	end
+	return true
 end
 
 
