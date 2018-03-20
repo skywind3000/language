@@ -70,6 +70,17 @@ end
 
 
 -----------------------------------------------------------------------
+-- table size
+-----------------------------------------------------------------------
+function table.length(T)
+	local count = 0
+	if T == nil then return 0 end
+	for _ in pairs(T) do count = count + 1 end
+	return count
+end
+
+
+-----------------------------------------------------------------------
 -- print table
 -----------------------------------------------------------------------
 function dump(o)
@@ -633,16 +644,23 @@ end
 -- add path
 -----------------------------------------------------------------------
 function z_add(path)
-	if not os.path.isdir(path) then
-		return false
+	local paths = {}
+	if type(path) == 'table' then
+		paths = path
+	elseif type(path) == 'string' then
+		paths[1] = path
 	end
-	if not os.path.isabs(path) then
+	if table.length(paths) == 0 then
 		return false
 	end
 	local M = data_load(DATA_FILE)
 	M = data_filter(M)
-	path = os.path.norm(path)
-	M = data_insert(M, path)
+	for _, path in pairs(paths) do
+		if os.path.isdir(path) and os.path.isabs(path) then
+			path = os.path.norm(path)
+			M = data_insert(M, path)
+		end
+	end
 	data_save(DATA_FILE, M)
 	return true
 end
@@ -741,6 +759,9 @@ function z_cd(patterns)
 		return nil
 	end
 	local last = patterns[#patterns]
+	if last == '~' then
+		return os.path.expand('~')
+	end
 	if os.path.isdir(last) then
 		return last
 	end
@@ -764,17 +785,41 @@ function main(argv)
 	local options, args = os.getopt(argv)
 	if options == nil then
 		return false
-	elseif (#args) == 0 then
+	elseif table.length(args) == 0 and table.length(options) == 0 then
 		print(os.argv[0] .. ': missing arguments')
 		help = os.argv[-1] .. ' ' .. os.argv[0] .. ' --help'
 		print('Try \'' .. help .. '\' for more information')
 		return false
 	end
-	if true then
+	if false then
 		print("options: ")
 		printT(options)
 		print("args: ")
 		printT(args)
+	end
+	if options['-c'] ~= nil then
+		Z_SUBDIR = true
+	end
+	if options['-r'] ~= nil then
+		Z_METHOD = 'rank'
+	elseif options['-t'] ~= nil then
+		Z_METHOD = 'time'
+	end
+	if options['--cd'] ~= nil then
+		local path = ''
+		if #args == 0 then
+			path = os.path.expand('~')
+		else
+			path = z_cd(args)
+		end
+		if path ~= nil then
+			io.write(path)
+		end
+	elseif options['--add'] ~= nil then
+		z_add(args)
+	elseif options['-l'] ~= nil then
+		local M = z_match(args ~= nil and args or {}, Z_METHOD, Z_SUBDIR)
+		z_print(M)
 	end
 	return true
 end
