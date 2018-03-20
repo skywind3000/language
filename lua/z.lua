@@ -13,10 +13,15 @@
 -----------------------------------------------------------------------
 local modname = 'z'
 local M = {}
-_G[modname]=M
-package.loaded[modname] = M  --return modname的功能
-setmetatable(M,{__index=_G})
-_ENV[modname] = M            -- setfenv(1, M)
+_G[modname] = M
+package.loaded[modname] = M  --return modname
+setmetatable(M,{__index = _G})
+
+if _ENV ~= nil then
+	_ENV[modname] = M
+else
+	setfenv(1, M)
+end
 
 
 -----------------------------------------------------------------------
@@ -111,6 +116,30 @@ function printT(table, level)
 		print(indent .. "}")
 	end
 	func(table, level)
+end
+
+
+-----------------------------------------------------------------------
+-- get current path
+-----------------------------------------------------------------------
+function os_pwd()
+	if windows then
+		local fp = io.popen('cd')
+		if fp == nil then
+			return ''
+		end
+		local line = fp:read('l')
+		fp:close()
+		return line
+	else
+		local fp = io.popen('pwd')
+		if fp == nil then
+			return ''
+		end
+		local line = fp:read('l')
+		fp:close()
+		return line
+	end
 end
 
 
@@ -573,6 +602,7 @@ end
 -- main entry
 -----------------------------------------------------------------------
 function main()
+	print('fuck')
 end
 
 
