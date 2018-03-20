@@ -162,12 +162,11 @@ end
 -----------------------------------------------------------------------
 function os_abspath(path)
 	if windows then
-		local script = 'FOR /F %%i IN ("%s") DO echo %%~fi'
+		local script = 'FOR /F %%i IN ("%s") DO @echo %%~fi'
 		local script = string.format(script, path)
 		local script = 'cmd.exe /C ' .. script
 		local output = os_call(script)
-		print(script)
-		print(output)
+		os.execute(script)
 	else
 	end
 end
