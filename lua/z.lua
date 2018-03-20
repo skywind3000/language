@@ -820,6 +820,11 @@ function main(argv)
 	elseif options['-l'] ~= nil then
 		local M = z_match(args ~= nil and args or {}, Z_METHOD, Z_SUBDIR)
 		z_print(M)
+	elseif options['--complete'] ~= nil then
+		local M = z_match(args ~= nil and args or {}, Z_METHOD, Z_SUBDIR)
+		for _, item in pairs(M) do
+			print(item.name)
+		end
 	end
 	return true
 end
