@@ -19,15 +19,18 @@ local pairs = pairs
 local tostring = tostring
 local tonumber = tonumber
 local windows = package.config:sub(1, 1) ~= '/' and true or false
+local nocase = false
+local module = module
 
-module('zlua')
-
+if module ~= nil then
+	module('zm') 
+end
 
 -----------------------------------------------------------------------
 -- Global Variable
 -----------------------------------------------------------------------
 local MAX_AGE = 5000
-local DATA_FILE = '~/.fasd'
+local DATA_FILE = '~/.zm'
 
 
 -----------------------------------------------------------------------
@@ -208,6 +211,23 @@ end
 
 
 -----------------------------------------------------------------------
+-- returns true for path is insensitive
+-----------------------------------------------------------------------
+function path_case_insensitive()
+	if windows then 
+		return true
+	end
+	local eos = os.getenv('OS')
+	eos = eos ~= nil and eos or ''
+	eos = eos:lower()
+	if eos:sub(1, 7) == 'windows' then
+		return true
+	end
+	return false
+end
+
+
+-----------------------------------------------------------------------
 -- load and split data
 -----------------------------------------------------------------------
 function data_load(filename)
@@ -272,6 +292,7 @@ end
 function data_filter(M)
 	local N = {}
 	local i
+	M = M ~= nil and M or {}
 	for i = 1, #M do
 		local item = M[i]
 		if path_isdir(item.name) then
@@ -302,13 +323,14 @@ function data_insert(M, filename)
 			end
 		end
 	end
+	local nocase = path_case_insensitive()
 	local name = filename
-	local key = windows and string.lower(name) or name
+	local key = nocase and string.lower(name) or name
 	local find = false
 	local current = os.time()
 	for i = 1, #M do
 		local item = M[i]
-		if not windows then
+		if not nocase then
 			if name == item.name then
 				item.rank = item.rank + 1
 				item.time = current
@@ -382,11 +404,7 @@ function data_select(M, patterns)
 	local pats = {}
 	for i = 1, #patterns do
 		local p = patterns[i]
-		if not windows then
-			table.insert(pats, p)
-		else
-			table.insert(pats, case_insensitive_pattern(p))
-		end
+		table.insert(pats, case_insensitive_pattern(p))
 	end
 	for i = 1, #M do
 		local item = M[i]
@@ -428,28 +446,33 @@ function z_add(path)
 	if not path_isdir(path) then
 		return false
 	end
+	if not path_isabs(path) then
+		return false
+	end
+	local M = data_load(DATA_FILE)
+	M = data_filter(M)
+	path = path_norm(path)
+	M = data_insert(M, path)
+	data_save(DATA_FILE, M)
+	return true
+end
 
+
+-----------------------------------------------------------------------
+-- match method: frecent, rank, time
+-----------------------------------------------------------------------
+function z_match(patterns, method, subdir)
+	patterns = patterns ~= nil and patterns or {}
+	method = method ~= nil and method or 'frecent'
+	subdir = subdir ~= nil and subdir or false
+	local M = data_load(DATA_FILE)
+	M = data_filter(M)
 end
 
 
 -----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
-local inname = windows and 'c:/users/linwei/.fasd' or '/cygdrive/c/users/linwei/.fasd'
-local outname = windows and 'd:/fasd.txt' or '/cygdrive/d/fasd.txt'
-local x = data_load(inname)
-x = data_filter(x)
-x = data_insert(x, 'd:/software')
-printT(x)
-data_save(outname, x)
-
-print(path_isdir('c:/windows'))
-print('---------')
-p = 'd:/dev/python27/lib/site-packages'
-
-print(path_match(p, {'lib', 'site'}))
-
-printT(data_select(x, {'i', 'c'}, true))
-print(path_subdir('d:\\Dev', p))
-print(path_expand('d:/dev'))
+-- z_add('D:/Dev/Python27')
+print(path_case_insensitive())
 
