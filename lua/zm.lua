@@ -468,8 +468,8 @@ function z_match(patterns, method, subdir)
 	method = method ~= nil and method or 'frecent'
 	subdir = subdir ~= nil and subdir or false
 	local M = data_load(DATA_FILE)
-	M = data_filter(M)
 	M = data_select(M, patterns)
+	M = data_filter(M)
 	M = data_update_frecent(M)
 	if method == 'time' then
 		current = os.time()
