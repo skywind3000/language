@@ -1,6 +1,6 @@
 --=====================================================================
 --
--- zm.lua - z module for lua
+-- zm.lua - z.sh implementation for lua
 --
 -- Created by skywind on 2018/03/19
 -- Last Modified: 2018/03/19 11:11:47
@@ -29,8 +29,10 @@ end
 -----------------------------------------------------------------------
 -- Global Variable
 -----------------------------------------------------------------------
-local MAX_AGE = 5000
-local DATA_FILE = '~/.zm'
+MAX_AGE = 5000
+DATA_FILE = '~/.zm'
+PRINT_TO_STDERR = false
+PWD = ''
 
 
 -----------------------------------------------------------------------
@@ -95,7 +97,7 @@ function printT(table, level)
 		end
 
 		key = ""
-		for k,v in pairs(table) do
+		for k, v in pairs(table) do
 			if type(v) == "table" then
 				key = k
 				func(v, level + 1)
@@ -396,7 +398,7 @@ end
 
 
 -----------------------------------------------------------------------
--- select available paths
+-- select matched pathnames
 -----------------------------------------------------------------------
 function data_select(M, patterns)
 	local N = {}
@@ -467,12 +469,77 @@ function z_match(patterns, method, subdir)
 	subdir = subdir ~= nil and subdir or false
 	local M = data_load(DATA_FILE)
 	M = data_filter(M)
+	M = data_select(M, patterns)
+	M = data_update_frecent(M)
+	if method == 'time' then
+		current = os.time()
+		for _, item in pairs(M) do
+			item.score = item.time - current
+		end
+	elseif method == 'rank' then
+		for _, item in pairs(M) do
+			item.score = item.rank
+		end
+	else
+		for _, item in pairs(M) do
+			item.score = item.frecent
+		end
+	end
+	table.sort(M, function (a, b) return a.score > b.score end)
+	if subdir then
+		local pwd = (PWD == nil or PWD == '') and os.getenv('PWD') or PWD
+		if pwd ~= '' and pwd ~= nil then 
+			local N = {}
+			for _, item in pairs(M) do
+				if path_subdir(pwd, item.name) then
+					table.insert(N, item)
+				end
+			end
+			M = N
+		end
+	end
+	return M
+end
+
+
+-----------------------------------------------------------------------
+-- pretty print 
+-----------------------------------------------------------------------
+function z_print(M)
+	local N = {}
+	local maxsize = 10
+	for _, item in pairs(M) do
+		local record = {}
+		record.score = string.format('%.2f', item.score)
+		record.name = item.name
+		table.insert(N, record)
+		if record.score:len() > maxsize then
+			maxsize = record.score:len()
+		end
+	end
+	for i = #N, 1, -1 do
+		local record = N[i]
+		local line = record.score
+		local dx = maxsize - line:len()
+		if dx > 0 then
+			line = line .. string.rep(' ', dx)
+		end
+		line = line .. '  ' .. record.name
+		if not PRINT_TO_STDERR then
+			print(line)
+		else
+			io.stderr:write(line .. '\n')
+		end
+	end
 end
 
 
 -----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
--- z_add('D:/Dev/Python27')
-print(path_case_insensitive())
+-- z_add('C:/Users/Linwei/.vim')
+-- print(path_case_insensitive())
+-- PWD = 'd:\\acm'
+m = z_match({'vim'}, '', true)
+z_print(m)
 
