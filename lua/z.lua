@@ -120,6 +120,20 @@ end
 
 
 -----------------------------------------------------------------------
+-- invoke command and retrive output
+-----------------------------------------------------------------------
+function os_call(command)
+	local fp = io.popen(command)
+	if fp == nil then
+		return nil
+	end
+	local line = fp:read('*l')
+	fp:close()
+	return line
+end
+
+
+-----------------------------------------------------------------------
 -- get current path
 -----------------------------------------------------------------------
 function os_pwd()
@@ -128,7 +142,7 @@ function os_pwd()
 		if fp == nil then
 			return ''
 		end
-		local line = fp:read('l')
+		local line = fp:read('*l')
 		fp:close()
 		return line
 	else
@@ -136,11 +150,28 @@ function os_pwd()
 		if fp == nil then
 			return ''
 		end
-		local line = fp:read('l')
+		local line = fp:read('*l')
 		fp:close()
 		return line
 	end
 end
+
+
+-----------------------------------------------------------------------
+-- get absolute path
+-----------------------------------------------------------------------
+function os_abspath(path)
+	if windows then
+		local script = 'FOR /F %%i IN ("%s") DO echo %%~fi'
+		local script = string.format(script, path)
+		local script = 'cmd.exe /C ' .. script
+		local output = os_call(script)
+		print(script)
+		print(output)
+	else
+	end
+end
+
 
 
 -----------------------------------------------------------------------
@@ -267,7 +298,7 @@ function data_load(filename)
 	local M = {}
 	fp = io.open(path_expand(filename), 'r')
 	if fp == nil then
-		return nil
+		return {}
 	end
 	for line in fp:lines() do
 		local part = string.split(line, '|')
@@ -314,6 +345,7 @@ function data_save(filename, M)
 	fp:close()
 	if tmpname ~= nil then
 		os.rename(tmpname, filename)
+		os.remove(tmpname)
 	end
 	return true
 end
