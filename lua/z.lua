@@ -164,7 +164,7 @@ end
 function os.path.which(exename)
 	local path = os.getenv('PATH')
 	if windows then
-		paths = path:split(';')
+		paths = ('.;' .. path):split(';')
 	else
 		paths = path:split(':')
 	end
@@ -177,6 +177,9 @@ function os.path.which(exename)
 		else
 			for _, ext in pairs({'.exe', '.cmd', '.bat'}) do
 				local name = path .. '\\' .. exename .. ext
+				if path == '.' then
+					name = exename .. ext
+				end
 				if os.path.exists(name) then
 					return name
 				end
@@ -198,9 +201,27 @@ function os.path.abspath(path)
 		local output = os.call(script)
 		return output
 	else
+		local test = os.path.which('realpath')
+		if test ~= nil and test ~= '' then
+			return os.call('realpath \'' .. path .. '\'')
+		end
+		local test = os.path.which('perl')
+		if test ~= nil and test ~= '' then
+			local s = 'perl -MCwd -e "print Cwd::realpath(\\$ARGV[0])" \'%s\''
+			local s = string.format(s, path)
+			return os.call(s)
+		end
+		for _, python in pairs({'python', 'python2', 'python3'}) do
+			local s = 'sys.stdout.write(os.path.abspath(sys.argv[1]))'
+			local s = '-c "import os, sys;' .. s .. '" \'' .. path .. '\''
+			local s = python .. ' ' .. s
+			local test = os.path.which(python)
+			if test ~= nil and test ~= '' then
+				return os.call(s)
+			end
+		end
 	end
 end
-
 
 
 -----------------------------------------------------------------------
@@ -315,6 +336,33 @@ function os.path.expand(pathname)
 		return home .. '/' .. pathname:sub(3, -1)
 	end
 	return pathname
+end
+
+
+-----------------------------------------------------------------------
+-- get lua executable
+-----------------------------------------------------------------------
+function os.interpreter()
+	if arg == nil then
+		return nil
+	end
+	local lua = arg[-1]	
+	if lua == 'lua' then
+		return os.path.which('lua')
+	end
+	return os.path.abspath(lua)
+end
+
+
+-----------------------------------------------------------------------
+-- get script name
+-----------------------------------------------------------------------
+function os.scriptname()
+	if arg == nil then
+		return nil
+	end
+	local script = arg[0]
+	return os.path.abspath(script)
 end
 
 
