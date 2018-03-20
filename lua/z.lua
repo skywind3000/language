@@ -7,24 +7,24 @@
 --
 --=====================================================================
 
-local string = string
-local table = table
-local io = io
-local os = os
-local package = package
-local print = print
-local assert = assert
-local type = type
-local pairs = pairs
-local tostring = tostring
-local tonumber = tonumber
-local windows = package.config:sub(1, 1) ~= '/' and true or false
-local nocase = false
-local module = module
 
-if module ~= nil then
-	module('z') 
-end
+-----------------------------------------------------------------------
+-- Module Header
+-----------------------------------------------------------------------
+local modname = 'z'
+local M = {}
+_G[modname]=M
+package.loaded[modname] = M  --return modname的功能
+setmetatable(M,{__index=_G})
+_ENV[modname] = M            -- setfenv(1, M)
+
+
+-----------------------------------------------------------------------
+-- Environment
+-----------------------------------------------------------------------
+local windows = package.config:sub(1, 1) ~= '/' and true or false
+local in_module = pcall(debug.getlocal, 4, 1) and true or false
+
 
 -----------------------------------------------------------------------
 -- Global Variable
@@ -570,12 +570,18 @@ end
 
 
 -----------------------------------------------------------------------
+-- main entry
+-----------------------------------------------------------------------
+function main()
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
--- z_add('C:/Users/Linwei/.vim')
--- print(path_case_insensitive())
--- PWD = 'd:\\acm'
--- m = z_match({'vim'}, '', true)
--- z_print(m)
-print(z_cd({'..'}))
+if not pcall(debug.getlocal, 4, 1) then
+	-- main script
+	main()
+end
+
 
