@@ -29,6 +29,7 @@ end
 -----------------------------------------------------------------------
 local windows = package.config:sub(1, 1) ~= '/' and true or false
 local in_module = pcall(debug.getlocal, 4, 1) and true or false
+os.path = {}
 
 
 -----------------------------------------------------------------------
@@ -122,7 +123,7 @@ end
 -----------------------------------------------------------------------
 -- invoke command and retrive output
 -----------------------------------------------------------------------
-function os_call(command)
+function os.call(command)
 	local fp = io.popen(command)
 	if fp == nil then
 		return nil
@@ -136,7 +137,7 @@ end
 -----------------------------------------------------------------------
 -- get current path
 -----------------------------------------------------------------------
-function os_pwd()
+function os.pwd()
 	if windows then
 		local fp = io.popen('cd')
 		if fp == nil then
@@ -158,15 +159,44 @@ end
 
 
 -----------------------------------------------------------------------
+-- which executable
+-----------------------------------------------------------------------
+function os.path.which(exename)
+	local path = os.getenv('PATH')
+	if windows then
+		paths = path:split(';')
+	else
+		paths = path:split(':')
+	end
+	for _, path in pairs(paths) do
+		if not windows then
+			local name = path .. '/' .. exename
+			if os.path.exists(name) then
+				return name
+			end
+		else
+			for _, ext in pairs({'.exe', '.cmd', '.bat'}) do
+				local name = path .. '\\' .. exename .. ext
+				if os.path.exists(name) then
+					return name
+				end
+			end
+		end
+	end
+	return nil
+end
+
+
+-----------------------------------------------------------------------
 -- get absolute path
 -----------------------------------------------------------------------
-function os_abspath(path)
+function os.path.abspath(path)
 	if windows then
 		local script = 'FOR /F %%i IN ("%s") DO @echo %%~fi'
 		local script = string.format(script, path)
-		local script = 'cmd.exe /C ' .. script
-		local output = os_call(script)
-		os.execute(script)
+		local script = 'cmd.exe /C ' .. script .. ' 2> nul'
+		local output = os.call(script)
+		return output
 	else
 	end
 end
@@ -176,8 +206,23 @@ end
 -----------------------------------------------------------------------
 -- dir exists
 -----------------------------------------------------------------------
-function path_isdir(pathname)
+function os.path.isdir(pathname)
 	local name = pathname .. '/'
+	local ok, err, code = os.rename(name, name)
+	if not ok then
+		if code == 13 then
+			return true
+		end
+		return false
+	end
+	return true
+end
+
+
+-----------------------------------------------------------------------
+-- file or path exists
+-----------------------------------------------------------------------
+function os.path.exists(name)
 	local ok, err, code = os.rename(name, name)
 	if not ok then
 		if code == 13 then
@@ -192,7 +237,7 @@ end
 -----------------------------------------------------------------------
 -- is absolute path
 -----------------------------------------------------------------------
-function path_isabs(pathname)
+function os.path.isabs(pathname)
 	local h1 = pathname:sub(1, 1)
 	if windows then
 		local h2 = pathname:sub(2, 2)
@@ -213,7 +258,7 @@ end
 -----------------------------------------------------------------------
 -- normalize path
 -----------------------------------------------------------------------
-function path_norm(pathname)
+function os.path.norm(pathname)
 	if windows then 
 		pathname = pathname:gsub('\\', '/')
 	end
@@ -227,7 +272,7 @@ end
 -----------------------------------------------------------------------
 -- check subdir
 -----------------------------------------------------------------------
-function path_subdir(basename, subname)
+function os.path.subdir(basename, subname)
 	if windows then
 		basename = basename:gsub('\\', '/')
 		subname = subname:gsub('\\', '/')
@@ -248,7 +293,7 @@ end
 -----------------------------------------------------------------------
 -- expand user home
 -----------------------------------------------------------------------
-function path_expand(pathname)
+function os.path.expand(pathname)
 	if not pathname:find('~') then
 		return pathname
 	end
@@ -295,7 +340,7 @@ end
 -----------------------------------------------------------------------
 function data_load(filename)
 	local M = {}
-	fp = io.open(path_expand(filename), 'r')
+	fp = io.open(os.path.expand(filename), 'r')
 	if fp == nil then
 		return {}
 	end
@@ -326,7 +371,7 @@ function data_save(filename, M)
 	local fp = nil
 	local tmpname = nil
 	local i
-	filename = path_expand(filename)
+	filename = os.path.expand(filename)
 	if windows then
 		fp = io.open(filename, 'w')
 	else
@@ -359,7 +404,7 @@ function data_filter(M)
 	M = M ~= nil and M or {}
 	for i = 1, #M do
 		local item = M[i]
-		if path_isdir(item.name) then
+		if os.path.isdir(item.name) then
 			table.insert(N, item)
 		end
 	end
@@ -507,15 +552,15 @@ end
 -- add path
 -----------------------------------------------------------------------
 function z_add(path)
-	if not path_isdir(path) then
+	if not os.path.isdir(path) then
 		return false
 	end
-	if not path_isabs(path) then
+	if not os.path.isabs(path) then
 		return false
 	end
 	local M = data_load(DATA_FILE)
 	M = data_filter(M)
-	path = path_norm(path)
+	path = os.path.norm(path)
 	M = data_insert(M, path)
 	data_save(DATA_FILE, M)
 	return true
@@ -553,7 +598,7 @@ function z_match(patterns, method, subdir)
 		if pwd ~= '' and pwd ~= nil then 
 			local N = {}
 			for _, item in pairs(M) do
-				if path_subdir(pwd, item.name) then
+				if os.path.subdir(pwd, item.name) then
 					table.insert(N, item)
 				end
 			end
@@ -615,7 +660,7 @@ function z_cd(patterns)
 		return nil
 	end
 	local last = patterns[#patterns]
-	if path_isdir(last) then
+	if os.path.isdir(last) then
 		return last
 	end
 	local M = z_match(patterns, Z_METHOD, Z_SUBDIR)
