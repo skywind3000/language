@@ -37,7 +37,7 @@ os.argv = arg ~= nil and arg or {}
 -- Global Variable
 -----------------------------------------------------------------------
 MAX_AGE = 5000
-DATA_FILE = '~/.zm'
+DATA_FILE = '~/.zlua'
 PRINT_TO_STDERR = false
 PWD = ''
 Z_METHOD = 'frecent'
@@ -827,6 +827,24 @@ function main(argv)
 		end
 	end
 	return true
+end
+
+
+-----------------------------------------------------------------------
+-- initialize from environment variable
+-----------------------------------------------------------------------
+function z_init()
+	local _zl_data = os.getenv('_ZL_DATA')
+	local _zl_maxage = os.getenv('_ZL_MAXAGE')
+	if _zl_data ~= nil then
+		DATA_FILE = _zl_data
+	end
+	if _zl_maxage ~= nil then
+		_zl_maxage = tonumber(_zl_maxage)
+		if _zl_maxage ~= nil then
+			MAX_AGE = _zl_maxage
+		end
+	end
 end
 
 
