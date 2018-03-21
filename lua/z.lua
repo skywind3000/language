@@ -762,7 +762,7 @@ function z_cd(patterns)
 	if last == '~' then
 		return os.path.expand('~')
 	end
-	if os.path.isdir(last) then
+	if os.path.isabs(last) and os.path.isdir(last) then
 		return last
 	end
 	local M = z_match(patterns, Z_METHOD, Z_SUBDIR)
