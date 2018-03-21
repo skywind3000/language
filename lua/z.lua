@@ -684,6 +684,12 @@ function z_add(path)
 			path = os.path.norm(path)
 			-- check ignore
 			if windows then
+				if path:len() == 3 and path:sub(2, 2) == ':' then
+					local tail = path:sub(3, 3)
+					if tail == '/' or tail == '\\' then
+						skip = true
+					end
+				end
 				test = os.path.norm(path:lower())
 			else
 				if H == path then
