@@ -42,6 +42,7 @@ PRINT_TO_STDERR = false
 PWD = ''
 Z_METHOD = 'frecent'
 Z_SUBDIR = false
+Z_EXCLUDE = {}
 
 
 -----------------------------------------------------------------------
@@ -66,6 +67,18 @@ function string:split(sSeparator, nMax, bRegexp)
 		aRecord[nField] = self:sub(nStart)
 	end
 	return aRecord
+end
+
+
+-----------------------------------------------------------------------
+-- string starts with
+-----------------------------------------------------------------------
+function string:startswith(text)
+	local size = text:len()
+	if self:sub(1, size) == text then
+		return true
+	end
+	return false
 end
 
 
@@ -432,6 +445,8 @@ end
 -----------------------------------------------------------------------
 function data_load(filename)
 	local M = {}
+	local N = {}
+	local insensitive = path_case_insensitive()
 	fp = io.open(os.path.expand(filename), 'r')
 	if fp == nil then
 		return {}
@@ -440,13 +455,17 @@ function data_load(filename)
 		local part = string.split(line, '|')
 		local item = {}
 		if part and part[1] and part[2] and part[3] then
+			local key = insensitive and part[1]:lower() or part[1]
 			item.name = part[1]
 			item.rank = tonumber(part[2])
 			item.time = tonumber(part[3]) + 0
 			item.frecent = item.rank
 			if string.len(part[3]) < 12 then
 				if item.rank ~= nil and item.time ~= nil then
-					table.insert(M, item)
+					if N[key] == nil then
+						table.insert(M, item)
+						N[key] = 1
+					end
 				end
 			end
 		end
@@ -645,6 +664,7 @@ end
 -----------------------------------------------------------------------
 function z_add(path)
 	local paths = {}
+	local count = 0
 	if type(path) == 'table' then
 		paths = path
 	elseif type(path) == 'string' then
@@ -653,15 +673,41 @@ function z_add(path)
 	if table.length(paths) == 0 then
 		return false
 	end
+	local H = os.getenv('HOME')
 	local M = data_load(DATA_FILE)
 	M = data_filter(M)
+	-- insert paths
 	for _, path in pairs(paths) do
 		if os.path.isdir(path) and os.path.isabs(path) then
+			local skip = false
+			local test = path
 			path = os.path.norm(path)
-			M = data_insert(M, path)
+			-- check ignore
+			if windows then
+				test = os.path.norm(path:lower())
+			else
+				if H == path then
+					skip = true
+				end
+			end
+			-- check exclude
+			if not skip then
+				for _, exclude in ipairs(Z_EXCLUDE) do
+					if test:startswith(exclude) then
+						skip = true
+						break
+					end
+				end
+			end
+			if not skip then
+				M = data_insert(M, path)
+				count = count + 1
+			end
 		end
 	end
-	data_save(DATA_FILE, M)
+	if count > 0 then
+		data_save(DATA_FILE, M)
+	end
 	return true
 end
 
@@ -836,6 +882,7 @@ end
 function z_init()
 	local _zl_data = os.getenv('_ZL_DATA')
 	local _zl_maxage = os.getenv('_ZL_MAXAGE')
+	local _zl_exclude = os.getenv('_ZL_EXCLUDE')
 	if _zl_data ~= nil then
 		DATA_FILE = _zl_data
 	end
@@ -843,6 +890,19 @@ function z_init()
 		_zl_maxage = tonumber(_zl_maxage)
 		if _zl_maxage ~= nil then
 			MAX_AGE = _zl_maxage
+		end
+	end
+	if _zl_exclude ~= nil then
+		local part = _zl_exclude:split(windows and ';' or ':')
+		local insensitive = path_case_insensitive()
+		for _, name in ipairs(part) do
+			if insensitive then
+				name = name:lower()
+			end
+			if windows then
+				name = os.path.norm(name)
+			end
+			Z_EXCLUDE[name] = 1
 		end
 	end
 end
