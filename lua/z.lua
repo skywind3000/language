@@ -915,11 +915,27 @@ end
 
 
 -----------------------------------------------------------------------
+-- initialize clink hooks
+-----------------------------------------------------------------------
+function z_clink_init()
+	function z_add_to_database()
+		z_add(clink.get_cwd())
+	end
+	clink.prompt.register_filter(z_add_to_database, 99)
+end
+
+
+-----------------------------------------------------------------------
 -- testing case
 -----------------------------------------------------------------------
 if not pcall(debug.getlocal, 4, 1) then
 	-- main script
-	main()
+	z_init()
+	if clink ~= nil and type(clink) == 'table' and clink.prompt ~= nil then
+		z_clink_init()
+	else
+		main()
+	end
 end
 
 
