@@ -32,6 +32,7 @@ d = {"grandpa" => {
 }}
 
 node = Tree.new(d)
+node.
 
 node.visit_all {|node| puts node.node_name}
 
