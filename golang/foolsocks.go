@@ -11,53 +11,50 @@
 package main
 
 import (
-	"flag"
-	"log"
-	"crypto/rc4"
-	"strconv"
-	"net"
-	"io"
 	"bytes"
+	"crypto/rc4"
+	"crypto/sha1"
 	"encoding/gob"
 	"errors"
-	"math/rand"
-	"time"
-	"crypto/sha1"
+	"flag"
 	"fmt"
+	"io"
+	"log"
+	"math/rand"
+	"net"
+	"strconv"
 	"strings"
+	"time"
 	// "os"
 )
-
 
 //---------------------------------------------------------------------
 // config
 //---------------------------------------------------------------------
 type Config struct {
-	run_mode string
+	run_mode    string
 	server_host string
 	client_host string
 	server_port int
 	client_port int
-	key string
-	method string
+	key         string
+	method      string
 }
 
-var config = Config {}
-
+var config = Config{}
 
 //---------------------------------------------------------------------
 // Protocol
 //---------------------------------------------------------------------
 type Protocol struct {
-	crypt_send *rc4.Cipher
-	crypt_recv *rc4.Cipher
-	twice_send *rc4.Cipher
-	twice_recv *rc4.Cipher
-	conn *net.TCPConn
-	esock *net.TCPConn
+	crypt_send     *rc4.Cipher
+	crypt_recv     *rc4.Cipher
+	twice_send     *rc4.Cipher
+	twice_recv     *rc4.Cipher
+	conn           *net.TCPConn
+	esock          *net.TCPConn
 	remote_address string
 }
-
 
 //---------------------------------------------------------------------
 // arguments_init()
@@ -85,7 +82,7 @@ func arguments_init() bool {
 		if config.server_host == "" {
 			config.server_host = "0.0.0.0"
 		}
-	}	else {
+	} else {
 		if config.server_host == "" {
 			log.Print("ERROR: empty server address, use -h to help")
 			return false
@@ -94,14 +91,13 @@ func arguments_init() bool {
 			config.client_host = "localhost"
 		}
 	}
-	log.Print("[config] running mode: ", config.run_mode)	
+	log.Print("[config] running mode: ", config.run_mode)
 	log.Print("[config] server address: ", config.server_host)
 	log.Print("[config] server port: ", config.server_port)
 	log.Print("[config] client address: ", config.client_host)
 	log.Print("[config] client port: ", config.client_port)
 	return true
 }
-
 
 //---------------------------------------------------------------------
 // handle error
@@ -110,7 +106,7 @@ func handle_error(err error) bool {
 	if err == nil {
 		return true
 	}
-	log.Printf("ERROR: %s", err.Error());
+	log.Printf("ERROR: %s", err.Error())
 	return false
 }
 
@@ -126,7 +122,7 @@ func main() {
 
 	if config.run_mode == "server" {
 		endpoint = config.server_host + ":" + strconv.Itoa(config.server_port)
-	}	else {
+	} else {
 		endpoint = config.client_host + ":" + strconv.Itoa(config.client_port)
 	}
 
@@ -147,7 +143,7 @@ func main() {
 		if err == nil {
 			log.Printf("new connection: %s", conn.RemoteAddr().String())
 			key := []byte(config.key)
-			protocol := Protocol {}
+			protocol := Protocol{}
 			protocol.crypt_recv, _ = rc4.NewCipher(key)
 			protocol.crypt_send, _ = rc4.NewCipher(key)
 			protocol.twice_recv = nil
@@ -157,57 +153,54 @@ func main() {
 			protocol.remote_address = ""
 			if config.run_mode == "server" {
 				protocol.esock = conn
-				go func (protocol *Protocol) {
+				go func(protocol *Protocol) {
 					defer protocol.conn.Close()
 					handle_server(protocol)
 				}(&protocol)
-			}	else {
-				go func (protocol *Protocol) {
+			} else {
+				go func(protocol *Protocol) {
 					defer protocol.conn.Close()
 					handle_client(protocol)
 				}(&protocol)
 			}
-		}	else {
+		} else {
 			handle_error(err)
 		}
 	}
 }
 
-
 //---------------------------------------------------------------------
 // random
 //---------------------------------------------------------------------
-func random_string (l int) string {  
-	var result bytes.Buffer  
-	var temp string  
-	randInt := func (min int, max int) int {  
-        rand.Seed( time.Now().UTC().UnixNano())  
-        return min + rand.Intn(max-min)  
-	}  
-	for i:=0 ; i<l ;  {  
-		if string(randInt(65,90))!=temp {  
-			temp = string(randInt(65,90))  
-			result.WriteString(temp)  
-			i++  
-		}  
-	}  
-	return result.String()  
+func random_string(l int) string {
+	var result bytes.Buffer
+	var temp string
+	randInt := func(min int, max int) int {
+		rand.Seed(time.Now().UTC().UnixNano())
+		return min + rand.Intn(max-min)
+	}
+	for i := 0; i < l; {
+		if string(randInt(65, 90)) != temp {
+			temp = string(randInt(65, 90))
+			result.WriteString(temp)
+			i++
+		}
+	}
+	return result.String()
 }
-
 
 //---------------------------------------------------------------------
 // encryption send
 //---------------------------------------------------------------------
 func encrypt_send(protocol *Protocol, buf []byte) (int, error) {
-	if (protocol.crypt_send != nil) {
+	if protocol.crypt_send != nil {
 		protocol.crypt_send.XORKeyStream(buf, buf)
 	}
-	if (protocol.twice_send != nil) {
+	if protocol.twice_send != nil {
 		protocol.twice_send.XORKeyStream(buf, buf)
 	}
 	return protocol.esock.Write(buf)
 }
-
 
 //---------------------------------------------------------------------
 // encryption recv
@@ -217,15 +210,14 @@ func encrypt_recv(protocol *Protocol, buf []byte) (int, error) {
 	if err != nil {
 		return n, err
 	}
-	if (protocol.twice_recv != nil) {
+	if protocol.twice_recv != nil {
 		protocol.twice_recv.XORKeyStream(buf[:n], buf[:n])
 	}
-	if (protocol.crypt_recv != nil) {
+	if protocol.crypt_recv != nil {
 		protocol.crypt_recv.XORKeyStream(buf[:n], buf[:n])
 	}
 	return n, nil
 }
-
 
 //---------------------------------------------------------------------
 // encryption recv all
@@ -235,15 +227,14 @@ func encrypt_recv_all(protocol *Protocol, buf []byte) (int, error) {
 	if err != nil {
 		return n, err
 	}
-	if (protocol.twice_recv != nil) {
+	if protocol.twice_recv != nil {
 		protocol.twice_recv.XORKeyStream(buf, buf)
 	}
-	if (protocol.crypt_recv != nil) {
+	if protocol.crypt_recv != nil {
 		protocol.crypt_recv.XORKeyStream(buf, buf)
 	}
 	return n, err
 }
-
 
 //---------------------------------------------------------------------
 // gob - send
@@ -257,9 +248,9 @@ func encrypt_send_gob(protocol *Protocol, m map[string]string) (int, error) {
 	if size >= 32767 {
 		return 0, errors.New("size exceed 0x7fff")
 	}
-	header := [2]byte {}
-	header[0] = byte(size & 0xff);
-	header[1] = byte(size / 256);
+	header := [2]byte{}
+	header[0] = byte(size & 0xff)
+	header[1] = byte(size / 256)
 
 	n, err := encrypt_send(protocol, header[:2])
 	if err != nil {
@@ -275,7 +266,6 @@ func encrypt_send_gob(protocol *Protocol, m map[string]string) (int, error) {
 	return n, err
 }
 
-
 //---------------------------------------------------------------------
 // gob - receive
 //---------------------------------------------------------------------
@@ -283,7 +273,7 @@ func encrypt_recv_gob(protocol *Protocol) (map[string]string, error) {
 	conn := protocol.esock
 	conn.SetReadDeadline(time.Now().Add(time.Second * 120))
 
-	header := [2]byte {}
+	header := [2]byte{}
 	n, err := encrypt_recv_all(protocol, header[:2])
 	if err != nil {
 		return nil, err
@@ -294,7 +284,7 @@ func encrypt_recv_gob(protocol *Protocol) (map[string]string, error) {
 	}
 
 	var size int
-	size = int(header[1]) * 256 + int(header[0])
+	size = int(header[1])*256 + int(header[0])
 
 	if size < 1 {
 		return nil, errors.New("encrypt_recv_gob: invalid header size")
@@ -326,12 +316,11 @@ func encrypt_recv_gob(protocol *Protocol) (map[string]string, error) {
 	return m, nil
 }
 
-
 //---------------------------------------------------------------------
 // socks5 hand shake
 //---------------------------------------------------------------------
 func socks5_handshake(conn *net.TCPConn) string {
-	buf := [512]byte {}
+	buf := [512]byte{}
 	conn.SetReadDeadline(time.Now().Add(time.Second * 25))
 	n, err := io.ReadFull(conn, buf[:2])
 	if !handle_error(err) {
@@ -360,7 +349,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 		return ""
 	}
 
-	if n !=4 {
+	if n != 4 {
 		log.Printf("ERROR: bad header")
 		return ""
 	}
@@ -387,7 +376,7 @@ func socks5_handshake(conn *net.TCPConn) string {
 			log.Print("ERROR: expect more bytes")
 			return ""
 		}
-		host = net.IPv4(buf[0],buf[1],buf[2],buf[3]).String()
+		host = net.IPv4(buf[0], buf[1], buf[2], buf[3]).String()
 	case 3:
 		n, err = io.ReadFull(conn, buf[:1])
 		if !handle_error(err) {
@@ -398,15 +387,15 @@ func socks5_handshake(conn *net.TCPConn) string {
 			return ""
 		}
 		size := int(buf[0])
-		n, err = io.ReadFull(conn, buf[:size + 2])
+		n, err = io.ReadFull(conn, buf[:size+2])
 		if !handle_error(err) {
 			return ""
 		}
-		if n != size + 2 {
+		if n != size+2 {
 			log.Print("ERROR: expect more bytes")
 			return ""
 		}
-		host = string(buf[:n - 2])
+		host = string(buf[:n-2])
 		// log.Printf("host2 is %s size is %d", host, size)
 	case 4:
 		n, err = io.ReadFull(conn, buf[:18])
@@ -431,11 +420,10 @@ func socks5_handshake(conn *net.TCPConn) string {
 	}
 
 	conn.SetReadDeadline(time.Time{})
-	port := strconv.Itoa(int(buf[n-2]) * 256 | int(buf[n-1]))
+	port := strconv.Itoa(int(buf[n-2])*256 | int(buf[n-1]))
 
 	return host + ":" + port
 }
-
 
 //---------------------------------------------------------------------
 // socks5 - establish
@@ -444,14 +432,13 @@ func socks5_estab(conn *net.TCPConn) {
 	conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 }
 
-
 //---------------------------------------------------------------------
 // bidirection copy
 //---------------------------------------------------------------------
 func encrypt_copy(protocol *Protocol) {
 	const BUF_SIZE int = 32768
 	ch := make(chan int)
-	go func () {
+	go func() {
 		buf := make([]byte, BUF_SIZE)
 		for {
 			n, err := encrypt_recv(protocol, buf[:BUF_SIZE])
@@ -460,7 +447,7 @@ func encrypt_copy(protocol *Protocol) {
 				if err != nil {
 					break
 				}
-			}	else {
+			} else {
 				if err == nil {
 					log.Printf("ERROR: Fatal recv zero")
 				}
@@ -469,7 +456,7 @@ func encrypt_copy(protocol *Protocol) {
 		}
 		ch <- 1
 	}()
-	go func () {
+	go func() {
 		buf := make([]byte, BUF_SIZE)
 		for {
 			n, err := protocol.conn.Read(buf)
@@ -478,7 +465,7 @@ func encrypt_copy(protocol *Protocol) {
 				if err != nil {
 					break
 				}
-			}	else {
+			} else {
 				if err == nil {
 					log.Printf("ERROR: Fatal recv zero")
 				}
@@ -487,10 +474,9 @@ func encrypt_copy(protocol *Protocol) {
 		}
 		ch <- 2
 	}()
-	<- ch
-	<- ch
+	<-ch
+	<-ch
 }
-
 
 //---------------------------------------------------------------------
 // client entry
@@ -521,7 +507,7 @@ func handle_client(protocol *Protocol) {
 	protocol.esock = client
 	defer client.Close()
 
-	m := map[string]string {}
+	m := map[string]string{}
 	m["random"] = random_string(12)
 	m["destination"] = address
 	m["name"] = "foolsocks"
@@ -552,13 +538,12 @@ func handle_client(protocol *Protocol) {
 	protocol.twice_recv, _ = rc4.NewCipher(rc4key)
 	protocol.twice_send, _ = rc4.NewCipher(rc4key)
 
-	log.Printf("established from %s to %s", 
+	log.Printf("established from %s to %s",
 		protocol.conn.RemoteAddr().String(), address)
 
 	encrypt_copy(protocol)
 	log.Printf("end transport")
 }
-
 
 //---------------------------------------------------------------------
 // server entry
@@ -599,7 +584,7 @@ func handle_server(protocol *Protocol) {
 	protocol.conn = client
 	defer client.Close()
 
-	r := map[string]string {}
+	r := map[string]string{}
 	r["name"] = "server"
 	r["remote"] = client.RemoteAddr().String()
 	r["status"] = "ok"
@@ -611,7 +596,7 @@ func handle_server(protocol *Protocol) {
 		return
 	}
 
-	log.Printf("established from %s to %s", 
+	log.Printf("established from %s to %s",
 		protocol.esock.RemoteAddr().String(), address)
 
 	secret := m["secret"] + r["secret"]
@@ -621,7 +606,6 @@ func handle_server(protocol *Protocol) {
 
 	encrypt_copy(protocol)
 }
-
 
 //---------------------------------------------------------------------
 // md5_sign
@@ -633,7 +617,6 @@ func md5_sign(ts int64, key string) string {
 	str = strconv.FormatInt(ts, 10) + "i" + str
 	return str
 }
-
 
 //---------------------------------------------------------------------
 // md5_check
@@ -662,7 +645,6 @@ func md5_check(ts int64, key string, sign string, diff int64) bool {
 	return true
 }
 
-
 //---------------------------------------------------------------------
 // make md5 signature from current timestamp and key
 //---------------------------------------------------------------------
@@ -671,7 +653,6 @@ func signature_sign(key string) string {
 	return md5_sign(ts, key)
 }
 
-
 //---------------------------------------------------------------------
 // check signature with current timestamp and key
 //---------------------------------------------------------------------
@@ -679,5 +660,3 @@ func signature_check(key string, sign string) bool {
 	ts := time.Now().Unix()
 	return md5_check(ts, key, sign, 600)
 }
-
-
