@@ -16,22 +16,22 @@ def check(m:list, depth:int):
     return True
 
 def search(m:list, depth:int):
-    size = len(m) - 1
+    size = len(m)
     if depth >= size:
         return 0
+    count = 0
     for x in range(size):
         m[depth] = x
         if check(m, depth):
             if depth == size - 1:
-                m[size] += 1
+                count += 1
             else:
-                search(m, depth + 1)
-    return 0
+                count += search(m, depth + 1)
+    return count
 
 def solve(size = 8):
-    m = [0] * (size + 1)
-    search(m, 0)
-    return m[size]
+    m = [0] * size
+    return search(m, 0)
 
 def benchmark(times, func):
     import time

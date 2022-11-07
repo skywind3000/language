@@ -19,26 +19,26 @@ function search(m, size, depth)
 	if depth >= size then
 		return 0
 	end
+	local count = 0
 	for x = 0, (size - 1) do
 		m[depth] = x
 		if check(m, depth) then
 			if depth == size - 1 then
-				m[size] = m[size] + 1
+				count = count + 1
 			else
-				search(m, size, depth + 1)
+				count = count + search(m, size, depth + 1)
 			end
 		end
 	end
-	return 0
+	return count
 end
 
 function solve(size)
 	local m = {}
-	for i = 0, size do
+	for i = 0, (size - 1) do
 		m[i] = 0
 	end
-	search(m, size, 0)
-	return m[size]
+	return search(m, size, 0)
 end
 
 function benchmark(times, func)
