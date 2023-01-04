@@ -1,0 +1,20 @@
+var n,ret,data; 
+  
+procedure myproc; 
+var save; 
+begin 
+  if n=1 then ret:=1; 
+  if n>1 then begin 
+     save:=n; 
+     n:=n-1; 
+     call myproc; 
+     n:=save; 
+     ret:=ret*n; 
+  end; 
+end; 
+  
+begin 
+  read(n); 
+  call myproc; 
+  write(ret); 
+end. 
