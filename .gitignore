@@ -1,0 +1,71 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+*.ipch
+*.sdf
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.lib
+
+# Customize
+*.class
+*.pyc
+*.pyo
+*.pyd
+*.bak
+*.old
+
+*.pdf
+*.epub
+*.mht
+*.chm
+*.mobi
+
+*.rar
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.log
+
+.netrwhist
+.DS_Store
+.tags
+.cscope
+.tasks
+.root
+.vscode/
+__pycache__/
+tags
+
+/test/*
+/language/incoming
+/language/parser/incoming
+
