@@ -12,5 +12,6 @@ module Main where
     main = do
         print (half 10)
         print (newline "sucker")
+        print (newline "sucker 2")
         
 
