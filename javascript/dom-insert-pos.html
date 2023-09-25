@@ -1,0 +1,18 @@
+<div id='list'>
+	<p id='java'>Java</p>
+	<p id='python'>Python</p>
+	<p id='scheme'>Scheme</p>
+</div>
+
+<script type='module'>
+window.onload = function() {
+	let list = document.getElementById('list');
+	let ref = document.getElementById('python');
+	let haskell = document.createElement('p');
+	haskell.id = 'haskell';
+	haskell.innerText = 'Haskell';
+	list.insertBefore(haskell, ref);
+}
+</script>
+
+

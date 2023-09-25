@@ -1,0 +1,33 @@
+<ol id="test-list">
+  <li class="lang">Scheme</li>
+  <li class="lang">JavaScript</li>
+  <li class="lang">Python</li>
+  <li class="lang">Ruby</li>
+  <li class="lang">Haskell</li>
+</ol>
+
+<script>
+window.onload = function() {
+	let array = [];
+	let list = document.getElementById('test-list');
+	while (list.children.length > 0) {
+		let c = list.lastChild;
+		c.remove();
+		array.push(c);
+	}
+	for (let i = 0; i < array.length - 1; i++) {
+		for (let j = i + 1; j < array.length; j++) {
+			if (array[i].innerText >= array[j].innerText) {
+				let t = array[i];
+				array[i] = array[j];
+				array[j] = t;
+			}
+		}
+	}
+	for (let i = 0; i < array.length; i++) {
+		list.appendChild(array[i]);
+	}
+}
+</script>
+
+

@@ -1,0 +1,16 @@
+<div id='list'>
+	<p id='java'>Java</p>
+	<p id='haskell'>Haskell</p>
+	<p id='python'>Python</p>
+	<p id='scheme'>Scheme</p>
+</div>
+<script>
+window.onload = function() {
+	let list = document.getElementById('list');
+	for (let i = 0; i < list.children.length; i++) {
+		let c = list.children[i];
+		console.log(c.innerHTML);
+	}
+}
+</script>
+

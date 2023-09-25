@@ -1,0 +1,21 @@
+<p id='js'>JavaScript</p>
+<div id='list'>
+	<p id='java'>Java</p>
+	<p id='python'>Python</p>
+	<p id='scheme'>Scheme</p>
+</div>
+
+<script>
+window.onload = function() {
+	var d = document.createElement('style');
+	d.setAttribute('type', 'text/css');
+	d.innerHTML = 'p { color: red }';
+	d.id = 'hello';
+	document.getElementsByTagName('head')[0].appendChild(d);
+	console.log(d);
+	console.log(d.id);
+}
+
+</script>
+
+
