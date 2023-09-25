@@ -1,0 +1,29 @@
+<div id="test-div">
+	<div class="c-red">
+		<p id="test-p">JavaScript</p>
+		<p>Java</p>
+	</div>
+	<div class="c-red c-green">
+		<p>Python</p>
+		<p>Ruby</p>
+		<p>Swift</p>
+	</div>
+	<div class="c-green">
+		<p>Scheme</p>
+		<p>Haskell</p>
+	</div>
+</div>
+
+<script>
+window.onload = function() {
+	var jsOne = document.getElementById("test-p");
+	var jsTwo = document.querySelector("#test-p");
+	var arrOne = document.getElementsByClassName("c-red c-green")[0].children;
+	var arrTwo = document.querySelectorAll('.c-red.c-green > p');
+	var haskellOne = document.getElementsByClassName('c-green')[1].lastElementChild;
+	var haskellTwo = document.querySelectorAll('.c-green')[1].lastElementChild;
+	console.log('hello');
+}
+</script>
+
+	
