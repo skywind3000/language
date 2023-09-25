@@ -1,0 +1,19 @@
+<ul id="test-list">
+	<li>JavaScript</li>
+	<li>Swift</li>
+	<li>HTML</li>
+	<li>ANSI C</li>
+	<li>CSS</li>
+	<li>DirectX</li>
+</ul>
+
+<script>
+window.onload = function() {
+	let elm = document.getElementById('test-list');
+	elm.removeChild(elm.children[1]);
+	elm.removeChild(elm.children[2]);
+	elm.removeChild(elm.children[3]);
+}
+</script>
+
+
