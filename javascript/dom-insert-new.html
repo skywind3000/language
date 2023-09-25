@@ -1,0 +1,19 @@
+<p id='js'>JavaScript</p>
+<div id='list'>
+	<p id='java'>Java</p>
+	<p id='python'>Python</p>
+	<p id='scheme'>Scheme</p>
+</div>
+
+<script>
+window.onload = function() {
+	var list = document.getElementById('list');
+	var haskell = document.createElement('p');
+	haskell.id = 'haskell';
+	haskell.innerText = 'Haskell';
+	list.appendChild(haskell);
+}
+
+</script>
+
+
