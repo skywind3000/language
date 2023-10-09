@@ -1,0 +1,27 @@
+<script>
+	class MyButton extends HTMLElement {
+		constructor() {
+			super();
+			console.log('constructor');
+		}
+		connectedCallback() {
+			const div = document.createElement('div');
+			div.innerHTML = '<button>btn</button>';
+			this.appendChild(div);
+			console.log('connectedCallback');
+		}
+	}
+	customElements.define('my-button', MyButton);
+</script>
+
+<div id='container'></div>
+
+<script>
+	const div = document.getElementById('container');
+	const btn = document.createElement('my-button');
+	console.log('created btn');
+	div.appendChild(btn);
+</script>
+
+
+
