@@ -1,0 +1,25 @@
+<my-button>
+	haha
+</my-button>
+
+
+<script>
+	class MyButton extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({mode: "open"});
+			const div = document.createElement("div");
+			div.innerHTML = "<button>btn</button>";
+			this.shadowRoot.appendChild(div);
+		}
+	}
+	customElements.define('my-button', MyButton);
+</script>
+
+
+<my-button>think </my-button>
+
+<my-button>
+	haha
+</my-button>
+
