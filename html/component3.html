@@ -18,7 +18,10 @@
 
 <script>
 	const div = document.getElementById('container');
+	const p = document.createElement('p');
 	const btn = document.createElement('my-button');
+	p.innerHTML = 'this is a p';
+	btn.appendChild(p);
 	console.log('created btn');
 	div.appendChild(btn);
 </script>

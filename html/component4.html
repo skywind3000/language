@@ -1,0 +1,37 @@
+<my-button>
+	haha
+</my-button>
+
+
+<script>
+	class MyButton extends HTMLElement {
+		constructor() {
+			super();
+			console.log('ctor: innerHTML', this.innerHTML);
+			for (let i = 0; i < this.childNodes.length; i++) {
+				console.log('[', i, '] ', this.childNodes[i]);
+			}
+		}
+		connectedCallback() {
+			console.log('connected: innerHTML', this.innerHTML);
+		}
+	}
+	customElements.define('my-button', MyButton);
+</script>
+
+
+<my-button>
+	think
+</my-button>
+
+<my-button> </my-button>
+
+<script>
+window.onload = () => {
+	const mbtns = document.querySelectorAll('my-button');
+	for (let i = 0; i < mbtns.length; i++) {
+		console.log('(', i, ')', mbtns[i].innerHTML);
+	}
+}
+</script>
+
