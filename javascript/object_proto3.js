@@ -11,9 +11,19 @@ function inherit(p) {
 	return new f();
 }
 
-var o = {x: 'dont change this value'};
-var x = inherit(o);
+var o = {};
+o.x = 1;
 
-console.log(x);
+var p = inherit(o);
+p.y = 2;
+
+var q = inherit(p);
+q.z = 3;
+
+var s = q.toString();
+console.log(s);
+
+console.log(q.x + q.y);
+
 
 
