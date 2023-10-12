@@ -11,18 +11,14 @@ function inherit(p) {
 	return new f();
 }
 
-var o = {};
-o.x = 1;
+var unitcircle = { r:1 };
+var c = inherit(unitcircle);
 
-var p = inherit(o);
-p.y = 2;
+c.x = 1;
+c.y = 1;
+c.r = 2;
 
-var q = inherit(p);
-q.z = 3;
-
-var s = q.toString();
-
-console.log(q.x + q.y);
-
+console.log(c.r);
+console.log(unitcircle.r);
 
 
