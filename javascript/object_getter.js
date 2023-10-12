@@ -8,4 +8,7 @@ console.log(o.access_prop);
 o.access_prop = 33;
 console.log(o.access_prop);
 
+console.log(o.propertyIsEnumerable('access_prop'));
+console.log(o.propertyIsEnumerable('data'));
+
 
