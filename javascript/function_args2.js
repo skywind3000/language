@@ -1,3 +1,4 @@
+"use strict";
 
 function foo(x, y) {
 	console.log(arguments.length);
