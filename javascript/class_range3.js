@@ -28,4 +28,9 @@ console.log(typeof r);
 
 console.log(r instanceof Range);
 
+var R2 = function() {};
+R2.prototype = Range.prototype;
+
+console.log(r instanceof R2);
+
 
