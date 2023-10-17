@@ -38,3 +38,6 @@ r.foreach(console.log);
 console.log(r);
 
 
+console.log(r instanceof range);
+
+
