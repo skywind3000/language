@@ -27,4 +27,7 @@ var r = new Range();
 
 console.log(type(r));
 
+var m = new Map();
+console.log(type(m));
+console.log(typeof Map);
 
