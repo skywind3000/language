@@ -1,7 +1,7 @@
 function extend(target, o) {
 	var names = Object.getOwnPropertyNames(o);
 	for (var i = 0; i < names.length; i++) {
-		if (names[i] in target) continue;
+		// if (names[i] in target) continue;
 		var desc = Object.getOwnPropertyDescriptor(o, names[i]);
 		Object.defineProperty(target, names[i], desc);
 	}
@@ -16,12 +16,18 @@ function defineClass(constructor, methods, statics) {
 var SimpleRange = defineClass(
 	function (f, t) { this.f = f; this.t = t; },
 	{
-		includes: function(x) { return this.f <= x  && x <= this.t; },
+		includes: function(x) { return this.f <= x && x <= this.t; },
 		toString: function() { return this.f+"..."+this.t; },
 	},
 	{
 		upto: function (t) { return new SimpleRange(0, t); },
 	},
 );
+
+
+var r = new SimpleRange(1, 3);
+
+console.log(r.includes(2));
+console.log(r.toString());
 
 
