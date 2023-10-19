@@ -1,13 +1,13 @@
 function objectId(o) {
-	var prop = '|**objectid**|'
+	var prop = '|**objectid**|';
 	if (!o.hasOwnProperty(prop)) {
 		var callee = arguments.callee;
 		if (!callee.hasOwnProperty('next')) {
 			callee.next = 100;
 		}
 		o[prop] = callee.next++;
-		return o[prop];
 	}
+	return o[prop];
 }
 
 function Set() {
@@ -30,6 +30,7 @@ Set._v2s = function (val) {
 			return '@' + objectId(val);
 		}
 	}
+	return 'fuck';
 }
 
 Set.prototype.add = function() {
@@ -61,12 +62,22 @@ Set.prototype.contains = function(value) {
 }
 
 var s = new Set();
+var o1 = {};
+var o2 = {};
+var o3 = {};
 
 s.add('123');
 s.add(1);
 s.add(2);
+s.add(o1, o2);
 
 console.log(s.contains(5));
 console.log(s.contains(2));
 console.log(s.contains('__proto__'));
+console.log(s.contains(o1), s.contains(o2), s.contains(o3));
+console.log(s.values);
+
+console.log('--------------');
+console.log(Set._v2s(o2));
+
 
