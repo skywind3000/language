@@ -35,4 +35,12 @@ console.log(Object.prototype.toString.call(r));
 console.log(Object.prototype.toString.call(Range));
 console.log(Object.prototype.toString.call(Range2));
 
+var s1 = 'hello, world';
+var s2 = new String('world');
+console.log(s1.length);
+console.log(Object.prototype.toString.call(s1));
+console.log(Object.prototype.toString.call(s2));
+console.log(typeof s1);
+console.log(typeof s2);
+
 
