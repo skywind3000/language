@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+        <style>
+        .avatar {
+            border-radius: 50%;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const user = {
+                name: 'Hedy Lamarr',
+                imageUrl: 'https://skywind3000.github.io/images/p/react/HedyLamarr.jpg',
+                imageSize: 90,
+            };
+
+            function Profile() {
+                return (
+                    <>
+                        <h1>{user.name}</h1>
+                        <img
+                            className='avatar'
+                            src={user.imageUrl}
+                            alt={'Photo of ' + user.name}
+                            style={{
+                                width: user.imageSize,
+                                height: user.imageSize,
+                            }}
+                        />
+                    </>
+                );
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<Profile />);
+        </script>
+    </body>
+
+</html>
+
+
+
+
