@@ -1,0 +1,19 @@
+E: E '+' T {add}
+ | E '-' T {sub}
+ | T {get1} 
+ ;
+T: T '*' F {mul}
+ | T '/' F {div}
+ | F {get1} 
+ ;
+F: number {getint} 
+ | "(" E ")" {get2}
+ ;
+
+%token number
+
+@ignore [ \t\r\n]*
+@match number \d+
+
+
+

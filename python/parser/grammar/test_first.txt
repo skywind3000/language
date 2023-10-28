@@ -1,0 +1,7 @@
+S : T B ;
+B : A B | ε ;
+A : + S | T B | * ;
+T : '(' S ')' | a  ;
+
+%token a
+

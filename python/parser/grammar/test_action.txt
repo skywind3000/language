@@ -1,0 +1,8 @@
+
+E: E {act1a} '+' {action1b} {action1c} T {act1d} {act1e}
+ | E '-' T {act2e}
+ ;
+
+T: {actT} number {actEND} ;
+
+

@@ -1,0 +1,19 @@
+%token NUMBER
+
+%left '+' '-'
+%left '*' '/' '%'
+%right UMINUS
+
+expr: expr '+' expr			{add}
+    | expr '-' expr			{sub}
+	| expr '*' expr			{mul}
+	| expr '/' expr			{div}
+	| '(' expr ')'			{get2}
+	| '-' expr %prec UMINUS		{negative}
+	| NUMBER				{getint}
+	;
+
+@ignore [ \r\n\t]*
+@match NUMBER \d+
+
+

@@ -1,0 +1,41 @@
+E: E + T | E - T | T ;
+T: T * F | T / F | F ;
+F: digit | "(" E ")" ;
+
+N: %empty ;
+
+V: | N N | N N N;
+
+%token digit NUMBER
+%left '+' '-'
+%left '*' "/"
+%nonassoc UMINUS
+
+%%
+expr: expr + term | expr - term | term;
+
+term:
+	term * factor
+	| term / factor
+	| factor
+	;
+
+factor: {haha} digit
+	| {action0} '(' expr ')' {action2}  %prec UMINUS;
+
+factor:  primary;
+
+# 'abc': F;
+
+empty: | | | ;
+
+test_empty: V | N N V | V V N | NUMBER;
+test_empty2: '+' NUMBER test_empty2 | test_empty;
+test_empty3: empty | V V V NUMBER N N;
+total_empty: empty | V V V N N;
+total_null: ;
+W: WEI | 'fuck' ;
+%%
+
+%start term
+

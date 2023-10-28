@@ -1,0 +1,22 @@
+%token digit NUMBER
+%left '+' '-'
+%left '*' "/"
+%nonassoc UMINUS
+
+%%
+expr: expr + term | expr - term | term;
+
+term:
+	term * factor
+	| term / factor
+	| factor
+	;
+
+factor: {haha} digit
+	| {action0} '(' expr ')' {action2}  %prec UMINUS;
+
+%%
+
+%start term
+
+

@@ -1,0 +1,13 @@
+E: E '+' T | E '-' T | T ;
+T: T '*' F | T '/' F | F ;
+F: number | "(" E ")" ;
+
+%token number
+
+# 'abc': F;
+
+@ignore [\r\n\t ]*
+@import NUMBER as number
+@match { action1 } \w+
+
+%token hahs

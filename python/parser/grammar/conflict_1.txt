@@ -1,0 +1,18 @@
+%token NUMBER
+
+%left '+' '-'
+%left '*' '/' '%'
+%right UMINUS
+
+expr: expr '+' expr
+    | expr '-' expr
+	| expr '*' expr
+	| expr '/' expr
+	| '(' expr ')'
+	| '-' expr %prec UMINUS
+	| NUMBER
+	;
+
+@ignore [ \r\n\t]*
+@match NUMBER \d+
+
