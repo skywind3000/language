@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+        <style>
+        .avatar {
+            border-radius: 50%;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const products = [
+                {title: 'Gabbage', isFruit: false, id: 1},
+                {title: 'Garlic', isFruit: false, id: 2},
+                {title: 'Apple', isFruit: true, id: 3},
+            ];
+
+            function ShoppingList() {
+                const listItems = products.map(product => 
+                    <li key={product.id} style={{
+                        color: product.isFruit? 'magenta' : 'darkgreen'
+                        }}
+                    >
+                        {product.title}
+                    </li>
+                );
+
+                return (<ul>{listItems}</ul>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<ShoppingList />);
+        </script>
+    </body>
+
+</html>
+
+
+
+
