@@ -33,9 +33,17 @@
                 );
             }
 
+            function MyApp() {
+                return (<div>
+                    <h1>Counters that update separately</h1>
+                    <div><MyButton/></div>
+                    <div><MyButton/></div>
+                </div>);
+            }
+
             const container = document.getElementById('root');
             const root = ReactDOM.createRoot(container);
-            root.render(<MyButton />);
+            root.render(<MyApp />);
         </script>
     </body>
 
