@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+        <style>
+        .avatar {
+            border-radius: 50%;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const {useState} = React;
+
+            function MyButton() {
+                const [count, setCount] = useState(0);
+                function handleClick() {
+                    setCount(count + 1);
+                }
+
+                return (
+                    <button onClick={handleClick}>
+                        Clicked {count} times
+                    </button>
+                );
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyButton />);
+        </script>
+    </body>
+
+</html>
+
+
+
+
