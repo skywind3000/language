@@ -110,7 +110,7 @@ if ($action == 'display') {
 </head>
 <body>
 <div id='monitor'><?=$value_html?></div>
-    <script>
+    <script type='module'>
         function RefreshContent() {
             var monitor = document.getElementById('monitor');
             var url = '<?=$url?>';
@@ -126,7 +126,33 @@ if ($action == 'display') {
                     setTimeout(RefreshContent, 500);
                 });
         }
+
         RefreshContent();
+
+        if ('wakeLock' in navigator) {
+            try {
+                let wakeLock = await navigator.wakeLock.request('screen');
+                console.log('wakeLock');
+                console.log(wakeLock);
+                document.addEventListener("visibilitychange", async () => {
+                    if (document.visibilityState === 'visible') {
+                        if (wakeLock === null || wakeLock.released === true) {
+                            console.log('check lost');
+                            try {
+                                wakeLock = await navigator.wakeLock.request('screen');
+                                console.log(wakeLock);
+                            }
+                            catch (err) {
+                                console.log(err);
+                            }
+                        }
+                    }
+                });
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
     </script>
 </body>
 </html>
