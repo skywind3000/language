@@ -168,12 +168,12 @@ $url2 = $script . '?action=qrcode&key=' . rawurlencode($key);
     <div>
         <p>Content:</p>
         <p>
-            <textarea name='value' cols=80 rows=24><?=$value_html?></textarea>
+            <textarea name='value' id='myta' cols=80 rows=24><?=$value_html?></textarea>
         </p>
     </div>
     <div>
         <p>
-            <input name='submit' type='submit' value="submit" />
+            <input name='submit' type='submit' value="submit" id='submit' />
         </p>
     </div>
     </form>
@@ -186,6 +186,20 @@ $url2 = $script . '?action=qrcode&key=' . rawurlencode($key);
         <a href='<?=$url2?>' target='_blank'>QRCode</a>
     </p>
 </div>
+<script>
+window.onload = function() {
+    var textarea = document.getElementById('myta');
+    var button = document.getElementById('submit');
+    textarea.focus();
+    textarea.selectionStart = textarea.value.length;
+    textarea.selectionEnd = textarea.value.length;
+    textarea.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key == 'Enter') {
+            button.click();
+        }
+    });
+}
+</script>
 </body>
 </html>
 
