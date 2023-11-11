@@ -167,9 +167,34 @@ if ($action == 'display') {
 # edit
 #----------------------------------------------------------------------
 $value = '';
+$markdown = false;
+
 if (isset($_REQUEST['value'])) {
     $value = $_REQUEST['value'];
-    apcu_store($apcu_key, $value);
+    if (isset($_REQUEST['markdown'])) {
+        $markdown = true;
+        $descriptorspec = array(
+            0 => array("pipe", "r"), 
+            1 => array("pipe", "w"),
+            2 => array("file", "/tmp/error-output.txt", "a")
+        );
+        $cwd = '/tmp';
+        $env = array('some_option' => 'aeiou');
+        $cmd = 'pandoc -f markdown-simple_tables-multiline_tables+pipe_tables -t html';
+        /* $cmd = $cmd . ' --table-style=simple'; */
+        $process = proc_open($cmd, $descriptorspec, $pipes, $cwd, $env);
+        if (is_resource($process)) {
+            fwrite($pipes[0], $value);
+            fclose($pipes[0]);
+            $html = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            proc_close($process);
+            apcu_store($apcu_key, $html);
+        }
+    }
+    else {
+        apcu_store($apcu_key, $value);
+    }
 }
 else {
     $value = apcu_fetch($apcu_key);
@@ -197,6 +222,10 @@ $url2 = $script . '?action=qrcode&key=' . rawurlencode($key);
         <p>Content:</p>
         <p>
             <textarea name='value' id='myta' cols=80 rows=24><?=$value_html?></textarea>
+        </p>
+        <p>
+        <span><input name='markdown' type='checkbox' id='cb1'/> </span>
+            <span>Markdown</span>
         </p>
     </div>
     <div>
@@ -226,6 +255,12 @@ window.onload = function() {
             button.click();
         }
     });
+    var check = document.getElementById('cb1');
+<?php
+    if ($markdown) {
+        echo "check.checked = true;\n";
+    }
+?>
 }
 </script>
 </body>
