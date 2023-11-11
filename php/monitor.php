@@ -1,4 +1,12 @@
 <?php
+#======================================================================
+#
+# monitor.php - monitor text on mobile devices
+#
+# Created by skywind on 2023/11/10
+# Last Modified: 2023/11/10 23:43:22
+#
+#======================================================================
 
 #----------------------------------------------------------------------
 # init
@@ -96,6 +104,7 @@ if ($action == 'display') {
     $url = $script . '?action=get&key=' . rawurlencode($key);
 ?>
 <html>
+<meta name="viewport" content="width=device-width" />
 <head>
 <title>Monitor - Display</title>
 </head>
@@ -109,6 +118,9 @@ if ($action == 'display') {
                 .then(response => response.text())
                 .then(data => {
                     monitor.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('request failed', error);
                 })
                 .finally(() => {
                     setTimeout(RefreshContent, 500);
