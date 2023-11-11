@@ -144,6 +144,7 @@ if ($action == 'display') {
                             }
                             catch (err) {
                                 console.log(err);
+                                // alert(err);
                             }
                         }
                     }
@@ -151,6 +152,7 @@ if ($action == 'display') {
             }
             catch (err) {
                 console.log(err);
+                // alert(err);
             }
         }
     </script>
