@@ -107,6 +107,7 @@ if ($action == 'display') {
 <meta name="viewport" content="width=device-width" />
 <head>
 <title>Monitor - Display</title>
+<link rel="stylesheet" type="text/css" href="https://benjam.info/panam/styling.css">
 </head>
 <body>
 <div id='monitor'><?=$value_html?></div>
@@ -230,7 +231,7 @@ $url2 = $script . '?action=qrcode&key=' . rawurlencode($key);
     </div>
     <div>
         <p>
-            <input name='submit' type='submit' value="submit" id='submit' />
+            <input name='submit' type='submit' value="Submit (Ctrl+Enter)" id='submit' />
         </p>
     </div>
     </form>
