@@ -107,7 +107,7 @@ if ($action == 'display') {
 <meta name="viewport" content="width=device-width" />
 <head>
 <title>Monitor - Display</title>
-<link rel="stylesheet" type="text/css" href="https://benjam.info/panam/styling.css">
+<!--<link rel="stylesheet" type="text/css" href="https://benjam.info/panam/styling.css">-->
 </head>
 <body>
 <div id='monitor'><?=$value_html?></div>
