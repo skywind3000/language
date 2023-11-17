@@ -1,0 +1,29 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+
+<body>
+    <div id="monitor"></div>
+    <script>
+        function RefreshContent() {
+            var monitor = document.getElementById('monitor');
+            var url = 'http://192.168.2.50/web/test1.php';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    monitor.innerHTML = 'result: ' + data;
+                })
+                .finally(() => {
+                    setTimeout(RefreshContent, 1000);
+                });
+        }
+        setTimeout(RefreshContent, 1000);
+    </script>
+</body>
+
+</html>
+
+
+

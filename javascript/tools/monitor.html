@@ -1,0 +1,23 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+
+<body>
+    <div id="monitor"></div>
+    <script>
+        var index = 0;
+        function RefreshContent() {
+            index += 1;
+            var monitor = document.getElementById('monitor');
+            monitor.innerHTML = 'result: ' + index;
+            setTimeout(RefreshContent, 1000);
+        }
+        setTimeout(RefreshContent, 1000);
+    </script>
+</body>
+
+</html>
+
+

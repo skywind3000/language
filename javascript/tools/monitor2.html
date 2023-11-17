@@ -1,0 +1,29 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+
+<body>
+    <div id="monitor"></div>
+    <script type="module">
+        var index = 0;
+        function timeout(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        async function RefreshContent() {
+            index += 1;
+            var monitor = document.getElementById('monitor');
+            monitor.innerHTML = 'result: ' + index;
+        }
+        while (1) {
+            await RefreshContent();
+            await timeout(1000);
+        }
+    </script>
+</body>
+
+</html>
+
+
+
