@@ -1,0 +1,56 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+
+<body>
+    <div id="monitor"></div>
+    <script type='module'>
+        function RefreshContent() {
+            var monitor = document.getElementById('monitor');
+            var url = 'http://192.168.2.50/web/test1.php';
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    monitor.innerHTML = 'result: ' + data;
+                })
+                .catch(error => {
+                      console.error('request failed', error);
+                })
+                .finally(() => {
+                    setTimeout(RefreshContent, 1000);
+                });
+        }
+        setTimeout(RefreshContent, 1000);
+
+        if ('wakeLock' in navigator) {
+            try {
+                let wakeLock = await navigator.wakeLock.request('screen');
+                console.log('wakeLock');
+                console.log(wakeLock);
+                document.addEventListener("visibilitychange", async () => {
+                    if (document.visibilityState === 'visible') {
+                        if (wakeLock === null || wakeLock.released === true) {
+                            console.log('check lost');
+                            try {
+                                wakeLock = await navigator.wakeLock.request('screen');
+                                console.log(wakeLock);
+                            }
+                            catch (err) {
+                            }
+                        }
+                    }
+                });
+            }
+            catch (err) {
+            }
+        }
+    </script>
+</body>
+
+</html>
+
+
+
+
