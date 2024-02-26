@@ -25,9 +25,10 @@ async def echo_server(reader, writer):
 
 async def main():
     server = await asyncio.start_server(echo_server, '0.0.0.0', 5001)
-    asyncio.create_task(echo_client())
+    task = asyncio.create_task(echo_client())
     print('serving on {}'.format(server.sockets[0].getsockname()))
     await server.serve_forever()
+    task.cancel()
     return 0
 
 
