@@ -1,0 +1,12 @@
+#! python3 ~/.vim/vim/lib/gptcoder.py -p
+
+you are a coder
+convert the following code for me
+
+<<<
+hello
+>>>
+world
+<<<
+how are you
+

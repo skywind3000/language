@@ -1,0 +1,43 @@
+#! python3 ~/.vim/vim/lib/gptcoder.py -p
+
+You're a coding assistant. I'll give you a bunch of code input,
+the text after colon mark (:) is the code you need to analyze. 
+
+Please provide suggestions for renaming the variables or function 
+name. The new names should be meaningful and consistent with the
+naming conventions used for other names in the same scope, and 
+avoid conflicts with existing variable names. Please ensure that
+the new names are not identical to the original names.
+
+<<<
+Rename the symbol in the following code in Python, the original 
+name is "shell", in the line 1 and column 5. 
+Only return 3 new names, each line contains one name and put it 
+in double quotes. Don't output anything else.
+
+Here is the code you need to analyze:
+def shell (self, options, args):
+	input_text = ''
+	if not sys.stdin.isatty():
+		try:
+			input_text = sys.stdin.read()
+		except:
+			pass
+	msgs = []
+	if len(args) > 0:
+		prompt = args[0].strip('\r\n\t ')
+		if prompt:
+			msgs.append({'role': 'system', 'content': prompt})
+	input_text = input_text.strip('\r\n\t ')
+	if input_text:
+		msgs.append({'role': 'user', 'content': input_text})
+	if not msgs:
+		return 0
+	if 0:
+		import pprint
+		pprint.pprint(msgs)
+	if 1:
+		msg = self.config.request(msgs)
+		print(msg)
+	return 0
+
