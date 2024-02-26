@@ -11,6 +11,21 @@ the new names are not identical to the original names.
 
 <<<
 Rename the symbol in the following code in Python, the original 
+name is "foo123", in the line 1 and column 5. 
+Only return 3 new names, each line contains one name and put it 
+in double quotes. Don't output anything else.
+
+Here is the code you need to analyze:
+def foo123 (self, options, args):
+	input_text = ''
+	if not sys.stdin.isatty():
+>>>
+"command_query"
+"interactive_cal"
+"calculator"
+
+<<<
+Rename the symbol in the following code in Python, the original 
 name is "shell", in the line 1 and column 5. 
 Only return 3 new names, each line contains one name and put it 
 in double quotes. Don't output anything else.
