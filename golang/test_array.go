@@ -9,3 +9,4 @@ func main() {
 	println("d[0] is", d[0])
 }
 
+
