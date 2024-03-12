@@ -8,6 +8,10 @@ class Hello {
 		int z = (int)y;
 		Console.WriteLine(y);
 		Console.WriteLine(z);
+		System.String abc = "Hello";
+		Object zz = abc;
+		Console.WriteLine(zz);
 	}
 }
+
 
