@@ -31,6 +31,7 @@ func main() {
 	fmt.Printf("cap=%d size=%d\n", cap(z), len(z))
 	u := append(z, 4)
 	v := append(u, 5)
+	v[1] = 100
 	displaySlice(z)
 	displaySlice(u)
 	displaySlice(v)
