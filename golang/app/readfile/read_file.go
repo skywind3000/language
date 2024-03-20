@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+
 	"github.com/goinaction/code/chapter3/words"
 )
 
@@ -17,5 +18,4 @@ func main() {
 	count := words.CountWords(text)
 	fmt.Printf("There are %d words in the text.\n", count)
 }
-
 
