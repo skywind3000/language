@@ -73,5 +73,5 @@ tags
 /language/incoming
 /language/parser/incoming
 vendor/*
-
+vendor/
 
