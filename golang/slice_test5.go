@@ -14,11 +14,13 @@ func printSlice(slice []int) {
 
 func main() {
 	slice := []int{10, 20, 30, 40, 50}
-	newSlice := slice[1:3]
+	printSlice(slice)
+	newSlice := slice[1:2:3]
+	s1 := append(newSlice, 60)
+	s2 := append(s1, 70)
+	println()
 	printSlice(slice)
 	printSlice(newSlice)
-	newSlice2 := append(newSlice, 60)
-	printSlice(slice)
-	printSlice(newSlice)
-	printSlice(newSlice2)
+	printSlice(s1)
+	printSlice(s2)
 }
