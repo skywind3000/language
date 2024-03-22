@@ -23,4 +23,5 @@ func main() {
 	printSlice(newSlice)
 	printSlice(s1)
 	printSlice(s2)
+	fmt.Printf("slice: %v\n", slice)
 }
