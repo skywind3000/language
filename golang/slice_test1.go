@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, World!")
 	var slice []int
 	if slice == nil {
 		fmt.Println("it is nil")
@@ -25,4 +24,12 @@ func main() {
 	fmt.Println(slice)
 	var slice2 []int = []int{1, 2, 3}
 	fmt.Println(slice2)
+	slice3 := make([]int, 0)
+	if slice3 == nil {
+		fmt.Println("slice3 is nil")
+		fmt.Printf("size=%d cap=%d\n", len(slice3), cap(slice3))
+	} else {
+		fmt.Println("slice3 is not nil")
+		fmt.Printf("size=%d cap=%d\n", len(slice3), cap(slice3))
+	}
 }
