@@ -22,9 +22,9 @@ func displaySlice(x []int) {
 }
 
 func main() {
-	x := [...]int{1, 2, 3};
-	y := x[0:2];
-	z := []int{1, 2, 3};
+	x := [...]int{1, 2, 3}
+	y := x[0:2]
+	z := []int{1, 2, 3}
 	fmt.Printf("%s\n", isSliceOrArray(x))
 	fmt.Printf("%s\n", isSliceOrArray(y))
 	fmt.Printf("%s\n", isSliceOrArray(z))
@@ -36,5 +36,3 @@ func main() {
 	displaySlice(u)
 	displaySlice(v)
 }
-
-
