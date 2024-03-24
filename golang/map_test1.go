@@ -11,4 +11,10 @@ func main() {
 	}
 	m["one"] = 1
 	fmt.Println(m)
+	fmt.Println(m["one"])
+	fmt.Println(len(m))
+	value, exists := m["two"]
+	println(value, exists)
+	value, exists = m["one"]
+	println(value, exists)
 }
