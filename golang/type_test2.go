@@ -13,6 +13,10 @@ func (ip IP) String() string {
 	return fmt.Sprintf("%v.%v.%v.%v", ip[0], ip[1], ip[2], ip[3])
 }
 
+func (ip IP) Add() {
+	ip[3] += 1
+}
+
 func main() {
 	var ip1 IP = []byte{192, 168, 1, 1}
 	fmt.Println(ip1.String())
@@ -20,6 +24,9 @@ func main() {
 	fmt.Println(ip1.String())
 	var ip2 IP = ip1
 	ip2[3] = 4
+	fmt.Println(ip1.String())
+	fmt.Println(ip2.String())
+	ip2.Add()
 	fmt.Println(ip1.String())
 	fmt.Println(ip2.String())
 }
