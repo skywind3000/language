@@ -23,3 +23,10 @@ func main() {
 	n1.notify()
 	n2.notify()
 }
+
+/*
+output:
+
+	Sending user email to user1
+	Sending user email to user2
+*/
