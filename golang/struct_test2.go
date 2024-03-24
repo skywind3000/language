@@ -11,14 +11,15 @@ func (self *user) notify() {
 	println("Sending user email to", self.name, self.email)
 }
 
+func newUser(name string) *user {
+	var nu user
+	nu.name = name
+	return &nu
+}
+
 func main() {
-	var bill user
-	bill.ext = 10
-	bill.name = "bill"
-	bill.email = "bill@163.com"
-	bill.notify()
-	var b2 *user = new(user)
-	b2.name = "zhj"
-	b2.email = "zhj@163.com"
-	b2.notify()
+	var n1 *user = newUser("user1")
+	var n2 *user = newUser("user2")
+	n1.notify()
+	n2.notify()
 }
