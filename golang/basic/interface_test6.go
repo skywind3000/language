@@ -36,4 +36,8 @@ func main() {
 		fmt.Printf("value: %v\n", y)
 	}
 
+	obj = getInterface("other")
+	if obj == nil {
+		fmt.Println("obj is nil")
+	}
 }
