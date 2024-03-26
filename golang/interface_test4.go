@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+type notifier interface {
+	notify()
+}
+
 type user struct {
 	name  string
 	email string
@@ -26,7 +30,9 @@ func main() {
 		},
 		level: "super",
 	}
-	fmt.Printf("The name is %s\n", ad.name)
-	ad.user.notify()
-	ad.notify()
+	sendNotification(&ad)
+}
+
+func sendNotification(n notifier) {
+	n.notify()
 }

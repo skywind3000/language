@@ -16,6 +16,7 @@ func (u *user) notify() {
 type admin struct {
 	user
 	level string
+	name  string
 }
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 			email: "john@email.com",
 		},
 		level: "super",
+		name:  "Lisa",
 	}
 	fmt.Printf("The name is %s\n", ad.name)
 	ad.user.notify()
