@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"sync"
 )
 
@@ -24,6 +25,7 @@ func incCounter(id int) {
 	for count := 0; count < 2; count++ {
 		mutex.Lock()
 		value := counter
+		runtime.Gosched()
 		value++
 		counter = value
 		mutex.Unlock()
