@@ -28,6 +28,7 @@ func main() {
 		tasks <- fmt.Sprintf("Task: %d", post)
 	}
 	close(tasks)
+	fmt.Println("main: sent all tasks")
 	wg.Wait()
 }
 
