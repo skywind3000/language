@@ -30,10 +30,19 @@ func main() {
 	describe(i)
 	i.M()
 
+	fmt.Println()
 	i = nil
+	describe(i)
+
+	t = nil
+	i = t
 	describe(i)
 }
 
 func describe(i I) {
-	fmt.Printf("(%v, %T)\n", i, i)
+	t := "not nil"
+	if i == nil {
+		t = "is nil"
+	}
+	fmt.Printf("(%v, %T) %s\n", i, i, t)
 }
