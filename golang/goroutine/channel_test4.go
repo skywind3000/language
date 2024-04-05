@@ -14,9 +14,11 @@ var fn func(int) int = scale
 func main() {
 	fmt.Println(time.Now().UnixNano())
 	x := 10
+
 	t1 := time.Now().UnixNano()
 	y := fn(x)
 	t1 = time.Now().UnixNano() - t1
+
 	fmt.Println(y, t1)
 	ch1 := make(chan int)
 	ch2 := make(chan int)
