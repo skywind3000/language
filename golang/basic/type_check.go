@@ -27,3 +27,13 @@ func main() {
 	check(i1)
 	check(i2)
 }
+
+/*
+output:
+Twice 21 is 42
+"hello" is 5 bytes long
+I don't know about type bool!
+check: obj is nil
+check: obj is nil
+Twice 32 is 64
+*/
