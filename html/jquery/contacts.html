@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系人管理</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        /* 添加一些基本样式 */
+        .contact-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            display: inline-block;
+        }
+        #contactForm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>联系人管理</h1>
+<button id="addContactBtn">新增联系人</button>
+<div id="contactList"></div>
+
+<div id="contactForm">
+    <h2 id="formTitle">新增联系人</h2>
+    <input type="text" id="name" placeholder="姓名" required>
+    <input type="text" id="phone" placeholder="电话" required>
+    <button id="saveContactBtn">保存</button>
+    <button id="cancelBtn">取消</button>
+</div>
+
+<script>
+// JavaScript/jQuery 部分
+let contacts = [];
+let editingIndex = -1;
+
+function renderContacts() {
+    $('#contactList').empty();
+    contacts.forEach((contact, index) => {
+        $('#contactList').append(`
+            <div class="contact-card">
+                <p>姓名: ${contact.name}</p>
+                <p>电话: ${contact.phone}</p>
+                <button onclick="editContact(${index})">编辑</button>
+                <button onclick="deleteContact(${index})">删除</button>
+            </div>
+        `);
+    });
+}
+
+function addContact() {
+    const name = $('#name').val();
+    const phone = $('#phone').val();
+    
+    if (editingIndex >= 0) {
+        contacts[editingIndex] = { name, phone };
+        editingIndex = -1;
+    } else {
+        contacts.push({ name, phone });
+    }
+
+    $('#name').val('');
+    $('#phone').val('');
+    $('#contactForm').hide();
+    renderContacts();
+}
+
+function editContact(index) {
+    editingIndex = index;
+    $('#name').val(contacts[index].name);
+    $('#phone').val(contacts[index].phone);
+    $('#formTitle').text('编辑联系人');
+    $('#contactForm').show();
+}
+
+function deleteContact(index) {
+    contacts.splice(index, 1);
+    renderContacts();
+}
+
+$(document).ready(function() {
+    $('#addContactBtn').click(function() {
+        $('#formTitle').text('新增联系人');
+        $('#contactForm').show();
+        editingIndex = -1; // Reset editing index
+    });
+
+    $('#saveContactBtn').click(addContact);
+    
+    $('#cancelBtn').click(function() {
+        $('#contactForm').hide();
+        $('#name').val('');
+        $('#phone').val('');
+    });
+});
+</script>
+
+</body>
+</html>
