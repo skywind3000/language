@@ -21,4 +21,8 @@ func main() {
 	println(len(a))
 	a[2] = 200
 	printSlice(a)
+	b := a[1:3]
+	printSlice(b)
+	c := b[0:3]
+	printSlice(c)
 }
