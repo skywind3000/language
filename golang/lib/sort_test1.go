@@ -10,4 +10,8 @@ func main() {
 	fmt.Println(array)
 	sort.Ints(array)
 	fmt.Println(array)
+	a2 := array[5:7]
+	a3 := a2[:5]
+	fmt.Println(a3)
+	fmt.Println(cap(a2))
 }
