@@ -25,4 +25,8 @@ func main() {
 	printSlice(b)
 	c := b[0:3]
 	printSlice(c)
+	d := a[0:1]
+	e := d[3:4]
+	printSlice(d)
+	printSlice(e)
 }
