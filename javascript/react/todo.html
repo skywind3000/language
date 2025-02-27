@@ -199,94 +199,94 @@ button:focus, button:focus-visible {
 const { useEffect, useState } = React;
 
 function App() {
-  const [tasks, setTasks] = useState([])
-  const [newTask, setNewTask] = useState('')
+	const [tasks, setTasks] = useState([])
+	const [newTask, setNewTask] = useState('')
 
-  useEffect(() => {
-    const savedTasks = localStorage.getItem('tasks')
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks))
-    }
-  }, [])
+	useEffect(() => {
+		const savedTasks = localStorage.getItem('tasks')
+		if (savedTasks) {
+			setTasks(JSON.parse(savedTasks))
+		}
+	}, [])
 
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks))
-  }, [tasks])
+	useEffect(() => {
+		localStorage.setItem('tasks', JSON.stringify(tasks))
+	}, [tasks])
 
-  const addTask = () => {
-    if (newTask.trim()) {
-      const task = {
-        id: Date.now(),
-        text: newTask,
-        dueDate: new Date().toISOString().split('T')[0],
-        completed: false,
-        createdAt: new Date().toISOString()
-      }
-      setTasks([...tasks, task])
-      setNewTask('')
-    }
-  }
+	const addTask = () => {
+		if (newTask.trim()) {
+			const task = {
+				id: Date.now(),
+				text: newTask,
+				dueDate: new Date().toISOString().split('T')[0],
+				completed: false,
+				createdAt: new Date().toISOString()
+			}
+			setTasks([...tasks, task])
+			setNewTask('')
+		}
+	}
 
-  const toggleComplete = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ))
-  }
+	const toggleComplete = (id) => {
+		setTasks(tasks.map(task =>
+			task.id === id ? { ...task, completed: !task.completed } : task
+		))
+	}
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id))
-  }
+	const deleteTask = (id) => {
+		setTasks(tasks.filter(task => task.id !== id))
+	}
 
-  const updateTaskDueDate = (id, newDate) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, dueDate: newDate } : task
-    ))
-  }
+	const updateTaskDueDate = (id, newDate) => {
+		setTasks(tasks.map(task =>
+			task.id === id ? { ...task, dueDate: newDate } : task
+		))
+	}
 
-  const sortedTasks = [...tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+	const sortedTasks = [...tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
 
-  const getTaskStatus = (task) => {
-    if (task.completed) return 'completed'
-    const now = new Date()
-    const dueDate = new Date(task.dueDate)
-    return now > dueDate ? 'expired' : 'pending'
-  }
+	const getTaskStatus = (task) => {
+		if (task.completed) return 'completed'
+		const now = new Date()
+		const dueDate = new Date(task.dueDate)
+		return now > dueDate ? 'expired' : 'pending'
+	}
 
-  return (
-    <div className="todo-container">
-      <h1>ToDo List</h1>
-      <div className="add-task">
-        <input
-          type="text"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Add your task"
-          onKeyPress={(e) => e.key === 'Enter' && addTask()}
-        />
-        <button onClick={addTask}>+</button>
-      </div>
-      <div className="task-list">
-        {sortedTasks.map(task => (
-          <div key={task.id} className={`task-item ${getTaskStatus(task)}`}>
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => toggleComplete(task.id)}
-            />
-            <span className="task-text">{task.text}</span>
-            <input
-              type="date"
-              value={task.dueDate}
-              onChange={(e) => updateTaskDueDate(task.id, e.target.value)}
-            />
-            <button onClick={() => deleteTask(task.id)} className="delete-btn">
-              🗑️
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+	return (
+		<div className="todo-container">
+		<h1>ToDo List</h1>
+		<div className="add-task">
+		<input
+		type="text"
+		value={newTask}
+		onChange={(e) => setNewTask(e.target.value)}
+		placeholder="Add your task"
+		onKeyPress={(e) => e.key === 'Enter' && addTask()}
+		/>
+		<button onClick={addTask}>+</button>
+		</div>
+		<div className="task-list">
+		{sortedTasks.map(task => (
+			<div key={task.id} className={`task-item ${getTaskStatus(task)}`}>
+			<input
+			type="checkbox"
+			checked={task.completed}
+			onChange={() => toggleComplete(task.id)}
+			/>
+			<span className="task-text">{task.text}</span>
+			<input
+			type="date"
+			value={task.dueDate}
+			onChange={(e) => updateTaskDueDate(task.id, e.target.value)}
+			/>
+			<button onClick={() => deleteTask(task.id)} className="delete-btn">
+			🗑️
+			</button>
+			</div>
+		))}
+		</div>
+		</div>
+	)
 }
 
 function Hello() {
