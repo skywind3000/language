@@ -289,19 +289,9 @@ function App() {
 	)
 }
 
-function Hello() {
-    return (
-        <React.StrictMode>
-            <h1>Hello World</h1>
-            <App />
-        </React.StrictMode>
-    );
-}
-
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
-root.render(<Hello/>);
-// root.render(<StrictMode> <Hello /> </StrictMode>,);
+root.render(<React.StrictMode> <App /> </React.StrictMode>);
 
 </script>
 
