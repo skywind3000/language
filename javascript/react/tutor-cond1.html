@@ -13,8 +13,25 @@
         <div id="root"></div>
         <script type="text/babel">
 
+            function MadeGoal() {
+                return <h1>Goal Made!</h1>;
+            }
+
+            function MissedGoal() {
+                return <h1>Goal Missed!</h1>;
+            }
+
+            function Goal(props) {
+                const isGoal = props.isGoal;
+                if (isGoal) {
+                    return <MadeGoal />;
+                } else {
+                    return <MissedGoal />;
+                }
+            }
+
             function MyApp() {
-                return <h1>Hello, World!</h1>;
+                return <Goal isGoal={true} />;
             }
 
             const container = document.getElementById('root');
@@ -25,4 +42,5 @@
     </body>
 
 </html>
+
 

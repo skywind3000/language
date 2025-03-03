@@ -13,8 +13,14 @@
         <div id="root"></div>
         <script type="text/babel">
 
+
             function MyApp() {
-                return <h1>Hello, World!</h1>;
+                const shoot = () => {
+                    alert("Great shot!");
+                }
+                return (
+                    <button onClick={shoot}>Take the shot!</button>
+                    );
             }
 
             const container = document.getElementById('root');
@@ -25,4 +31,7 @@
     </body>
 
 </html>
+
+
+
 
