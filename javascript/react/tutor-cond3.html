@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            function MadeGoal() {
+                return <h1>Goal Made!</h1>;
+            }
+
+            function MissedGoal() {
+                return <h1>Goal Missed!</h1>;
+            }
+
+            function Goal(props) {
+                const isGoal = props.isGoal;
+                return (<>
+                    {isGoal? <MadeGoal /> : <MissedGoal />}
+                </>);
+            }
+
+            function MyApp() {
+                return <Goal isGoal={true} />;
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+

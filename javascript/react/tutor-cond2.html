@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            function Garage(props) {
+                const cars = props.cars;
+                return (<>
+                    <h1>Garage</h1>
+                    {cars.length > 0 &&
+                        <h2>
+                        You have {cars.length} cars in your garage
+                        </h2>
+                    }
+                    </>);
+            }
+
+            function MyApp() {
+                const cars = ['Ford', 'BMW', 'Fiat'];
+                return <Garage cars={cars} />;
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
