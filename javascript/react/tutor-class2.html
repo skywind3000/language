@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            class Car extends React.Component {
+                constructor(props) {
+                    super(props);
+                }
+
+                render() {
+                    var x = "Car";
+                    return <h2>I am a {this.props.color} {x}!</h2>;
+                }
+            }
+
+            function MyApp() {
+                return (<div>
+                        <h1>Hello, World!</h1>
+                        <Car color="blue" />
+                    </div>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+
+
