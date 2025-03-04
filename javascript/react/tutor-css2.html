@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            function MyApp() {
+                const myStyle = {
+                    color: 'white',
+                    backgroundColor: 'DodgerBlue',
+                    padding: '10px',
+                    fontFamily: 'Arial',
+                };
+                return (<>
+                    <h1 style={myStyle}>Hello Style</h1>
+                    <p>Add a title style!</p>
+                </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
