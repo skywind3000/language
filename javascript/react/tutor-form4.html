@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            function MyApp() {
+                const [textarea, setTextarea] = React.useState(
+                    'The content of a textarea goes in the value attribute');
+                const handleChange = (e) => {
+                    setTextarea(e.target.value);
+                }
+                return (<form>
+                    <textarea value={textarea} onChange={handleChange}>
+                    </textarea>
+                    <textarea />
+                    <input type="text" />
+                </form>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+

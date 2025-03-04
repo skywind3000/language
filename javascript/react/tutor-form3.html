@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            let useState = React.useState;
+
+            function MyApp() {
+                const [inputs, setInputs] = useState({});
+                const handleChanges = (e) => {
+                    const name = e.target.name;
+                    const value = e.target.value;
+                    setInputs(values => ({...values, [name]: value}));
+                }
+                const handleSubmit = (e) => {
+                    e.preventDefault();
+                    console.log(inputs);
+                }
+                return (<form onSubmit={handleSubmit}>
+                    <label>Enter your name:
+                        <input type='text'
+                            value={inputs.username || ""}
+                            onChange={handleChanges}
+                            name='username' />
+                    </label>
+                    <label>Enter your age:
+                        <input type="number"
+                            name="age"
+                            value={inputs.age || ""}
+                            onChange={handleChanges} />
+                    </label>
+                    <input type='submit' />
+                </form>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+
