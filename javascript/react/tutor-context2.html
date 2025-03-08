@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const {useState, createContext, useContext} = React;
+
+            const UserContext = createContext();
+
+            function Component1() {
+                const [user, setUser] = useState('Jesse Hall');
+                return (<>
+                        <UserContext.Provider value={user}>
+                            <h1>{`Hello, ${user}!`}</h1>
+                            <Component2 />
+                        </UserContext.Provider>
+                    </>);
+            }
+
+            function Component2() {
+                return (<>
+                        <h1>Component 2</h1>
+                        <Component3 />
+                    </>);
+            }
+
+            function Component3() {
+                return (<>
+                        <h1>Component 3</h1>
+                        <Component4 />
+                    </>);
+            }
+
+            function Component4() {
+                return (<>
+                        <h1>Component 4</h1>
+                        <Component5 />
+                    </>);
+            }
+
+            function Component5() {
+                const user = useContext(UserContext);
+                return (<>
+                        <h1>Component 5</h1>
+                        <h2>Hello, {user} again!</h2>
+                    </>);
+            }
+
+            function MyApp() {
+                return <Component1 />;
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+

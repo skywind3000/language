@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const {useState, useEffect} = React;
+
+            function Timer() {
+                const [count, setCount] = useState(0);
+                useEffect(() => {
+                    let timer = setTimeout(() => {
+                            setCount(count + 1);
+                            }, 1000);
+                    return () => {
+                        clearTimeout(timer);
+                    }
+                }, []);
+                return <h1>I have rendered {count} times!</h1>;
+            }
+
+            function MyApp() {
+                return (
+                    <div>
+                        <h1>My App</h1>
+                        <Timer />
+                        <Timer />
+                    </div>
+                );
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+
+

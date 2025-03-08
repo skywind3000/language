@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const { useReducer, useState } = React;
+
+            const initialState = [
+                { id: 1, complete: false, title: 'Learn React' },
+                { id: 2, complete: false, title: 'Learn Redux' },
+                { id: 3, complete: false, title: 'Build something awesome' },
+            ];
+
+            const reducer = (state, action) => {
+                switch (action.type) {
+                case 'COMPLETE':
+                    return state.map((todo) => {
+                        if (todo.id === action.id) {
+                            return { ...todo, complete: !todo.complete };
+                        } else {
+                            return todo;
+                        }
+                    });
+                default:
+                    return state;
+                }
+            };
+
+            function TodoList() {
+                const [todos, dispatch] = useReducer(reducer, initialState);
+
+                const handleComplete = (todo) => {
+                    dispatch({ type: 'COMPLETE', id: todo.id });
+                };
+
+                return (<>
+                    {todos.map((todo) => (
+                        <div key={todo.id}>
+                            <label>
+                                <input type="checkbox"
+                                    checked={todo.complete}
+                                    onChange={() => handleComplete(todo)}
+                                    />
+                                {todo.title}
+                            </label>
+                        </div>
+                    ))}
+                </>);
+            }
+
+            function MyApp() {
+                return <TodoList />;
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
