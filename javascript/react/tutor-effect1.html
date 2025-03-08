@@ -17,11 +17,12 @@
 
             function MyApp() {
                 const [count, setCount] = useState(0);
+                console.log('before effect');
                 useEffect(() => {
-                    setTimeout(() => {
-                        setCount(count + 1);
-                        }, 1000);
+                    setTimeout(() => { setCount(count + 1); }, 1000);
+                    console.log('in effect');
                     });
+                console.log('after effect');
                 return <h1>I have rendered {count} times!</h1>;
             }
 
