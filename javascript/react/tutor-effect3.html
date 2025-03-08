@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const {useState, useEffect} = React;
+
+            function MyApp() {
+                const [count, setCount] = useState(0);
+                const [calculation, setCalculation] = useState(0);
+                useEffect(() => {
+                    setCalculation(count * 2);
+                    }, [count]);
+                return (<>
+                    <p>Count: {count}</p>
+                    <button onClick={() => setCount(count + 1)}>+</button>
+                    <p>Calculation: {calculation}</p>
+                    </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+

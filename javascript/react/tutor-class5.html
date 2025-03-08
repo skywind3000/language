@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            class Header extends React.Component {
+                constructor() {
+                    super();
+                    this.state = {favorite: "red"};
+                }
+
+                componentDidMount() {
+                    setTimeout(() => {
+                            this.setState({favorite: 'yellow'});
+                        }, 1000);
+                }
+
+                render() {
+                    return <h1>My favorite color is {this.state.favorite}</h1>;
+                }
+            }
+
+            function MyApp() {
+                return (<div>
+                        <Header />
+                    </div>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+
+
+
