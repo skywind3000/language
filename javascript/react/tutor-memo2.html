@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const {useState, useMemo} = React;
+
+            const expensiveCalculation = (num) => {
+                console.log("Calculating...");
+                for (let i = 0; i < 1000000000; i++) {
+                    num += 1;
+                }
+                console.log('done');
+                return num
+            }
+
+            function MyApp() {
+                const [count, setCount] = useState(0);
+                const [todos, setTodos] = useState([]);
+                const calculation = useMemo(() => {
+                    return expensiveCalculation(count);
+                    }, [count]);
+                const increment = () => {
+                    setCount(count + 1);
+                }
+                const addTodo = () => {
+                    setTodos([...todos, `Todo ${todos.length}`]);
+                }
+                return (<>
+                    <div>
+                        <div>
+                            <h2>My Todos</h2>
+                            {todos.map((todo, index) => {
+                                return <p key={index}>{todo}</p>
+                            })}
+                            <button onClick={addTodo}>Add Todo</button>
+                        </div>
+                        <hr/>
+                        <div>
+                            Count: {count}
+                            <button onClick={increment}>+</button>
+                            <h2>Expensive Calculation</h2>
+                            {calculation}
+                        </div>
+                    </div>
+                </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
