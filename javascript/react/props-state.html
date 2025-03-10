@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>React Props to State Example</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
@@ -49,12 +49,21 @@
             // 错误做法：将props复制到state
             const [localCount, setLocalCount] = React.useState(props.count);
             
+            // 创建时显示日志
+            React.useEffect(() => {
+                console.log('Component created');
+            }, []);
+            
             // 尝试通过useEffect更新state，但仍有问题
             React.useEffect(() => {
                 console.log("Props changed, updating local state");
+                // 如果用 development 的 react，那么每次 props 改变，这个
+                // component 都会重新创建，注释掉下面这句都没问题；
+                // 如果用 production 的 react，注释掉下面这句则会不同步，
+                // 每次 props 改变不会引起 state 复位；
                 setLocalCount(props.count);
             }, [props.count]);
-            
+
             const incrementLocal = () => {
                 setLocalCount(localCount + 1);
             };
