@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            function MyApp() {
+                const [myCar, setMyCar] = React.useState('Volvo');
+                const handleChange = (e) => {
+                    setMyCar(e.target.value);
+                }
+                return (<form>
+                    <select value={myCar} onChange={handleChange}>
+                        <option value='Ford'>Ford</option>
+                        <option value='Volvo'>Volvo</option>
+                        <option value='Fiat'>Fiat</option>
+                    </select>
+                </form>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
+
+

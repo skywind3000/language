@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Props to State Example</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { margin: 5px; padding: 8px 15px; }
+        .warning { color: red; }
+        .correct { color: green; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Parent component that holds the source of truth
+        function ParentComponent() {
+            const [count, setCount] = React.useState(0);
+            
+            const incrementCount = () => {
+                setCount(count + 1);
+            };
+            
+            return (
+                <div>
+                    <h2>Props vs State Example</h2>
+                    <p>Parent Count: {count}</p>
+                    <button onClick={incrementCount}>Increment in Parent</button>
+                    
+                    <div className="container">
+                        <h3>Bad Practice (Copying props to state)</h3>
+                        <BadChildComponent count={count} />
+                    </div>
+                    
+                    <div className="container">
+                        <h3>Good Practice (Using props directly)</h3>
+                        <GoodChildComponent count={count} />
+                    </div>
+                </div>
+            );
+        }
+        
+        // BAD: Child component that copies props to state
+        function BadChildComponent(props) {
+            // 错误做法：将props复制到state
+            const [localCount, setLocalCount] = React.useState(props.count);
+            
+            // 尝试通过useEffect更新state，但仍有问题
+            React.useEffect(() => {
+                console.log("Props changed, updating local state");
+                setLocalCount(props.count);
+            }, [props.count]);
+            
+            const incrementLocal = () => {
+                setLocalCount(localCount + 1);
+            };
+            
+            return (
+                <div>
+                    <p>Props from parent: <strong>{props.count}</strong></p>
+                    <p>Local state copy: <strong>{localCount}</strong></p>
+                    <button onClick={incrementLocal}>Increment Local Copy</button>
+                    <p className="warning">
+                        问题: 如果你点击"Increment Local Copy"按钮，
+                        本地状态将与父组件中的数据不同步。
+                        如果之后父组件更新了props，
+                        本地状态会被覆盖，丢失本地的修改。
+                    </p>
+                </div>
+            );
+        }
+        
+        // GOOD: Child component that uses props directly
+        function GoodChildComponent(props) {
+            const [additionalCount, setAdditionalCount] = React.useState(0);
+            
+            const incrementAdditional = () => {
+                setAdditionalCount(additionalCount + 1);
+            };
+            
+            // 派生数据：从props和本地state计算
+            const totalCount = props.count + additionalCount;
+            
+            return (
+                <div>
+                    <p>Props from parent: <strong>{props.count}</strong></p>
+                    <p>Additional local count: <strong>{additionalCount}</strong></p>
+                    <p>Computed total: <strong>{totalCount}</strong></p>
+                    <button onClick={incrementAdditional}>Add Local Value</button>
+                    <p className="correct">
+                        好处: 这种方式直接使用props，同时为组件特定的状态保留本地state。
+                        派生值通过计算获得，不会出现同步问题，
+                        父组件和子组件的责任边界清晰。
+                    </p>
+                </div>
+            );
+        }
+        
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ParentComponent />);
+    </script>
+</body>
+</html>
+

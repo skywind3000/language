@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const { useState, memo } = React;
+
+            function Todos({todos}) {
+                console.log('child render');
+                return (<>
+                        <h2>My Todos</h2>
+                        {todos.map((todo, index) => {
+                            return <p key={index}>{todo}</p>;
+                            })}
+                    </>);
+            }
+
+            const MemorizedTodos = memo(Todos);
+
+            function MyApp() {
+                const [count, setCount] = useState(0);
+                const [todos, setTodos] = useState(['todo 1', 'todo 2']);
+                const increment = () => { 
+                    setCount(count + 1); 
+                }
+                return (<>
+                    <MemorizedTodos todos={todos} />
+                    <hr />
+                    <div>
+                        Count: {count}
+                        <button onClick={increment}>+</button>
+                    </div>
+                </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<MyApp />);
+
+        </script>
+    </body>
+
+</html>
+
+
