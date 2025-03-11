@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五子棋游戏</title>
+  <!-- 引入 React 和 ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- 引入 Babel 用于 JSX 转换 -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .status {
+      margin-bottom: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .board {
+      display: grid;
+      grid-template-columns: repeat(15, 30px);
+      grid-template-rows: repeat(15, 30px);
+      background-color: #deb887;
+      border: 2px solid #333;
+    }
+    
+    .intersection {
+      width: 30px;
+      height: 30px;
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .intersection::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: #333;
+    }
+    
+    .intersection::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: #333;
+    }
+    
+    .piece {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    
+    .piece.black {
+      background-color: #000;
+    }
+    
+    .piece.white {
+      background-color: #fff;
+      border: 1px solid #aaa;
+    }
+    
+    .restart-btn {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .restart-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // 棋盘大小定义
+    const BOARD_SIZE = 15;
+    const WIN_COUNT = 5;
+
+    // 棋子组件
+    const Piece = ({ color }) => {
+      return color ? <div className={`piece ${color}`}></div> : null;
+    };
+
+    // 棋盘交叉点组件
+    const Intersection = ({ x, y, value, onClick }) => {
+      return (
+        <div className="intersection" onClick={() => onClick(x, y)}>
+          <Piece color={value} />
+        </div>
+      );
+    };
+
+    // 主游戏组件
+    const GomokuGame = () => {
+      // 状态初始化
+      const [board, setBoard] = React.useState(Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null)));
+      const [isBlackTurn, setIsBlackTurn] = React.useState(true);
+      const [winner, setWinner] = React.useState(null);
+      const [gameActive, setGameActive] = React.useState(true);
+
+      // 判断是否有玩家获胜
+      const checkWinner = (board, x, y, currentPlayer) => {
+        const directions = [
+          [1, 0],   // 水平
+          [0, 1],   // 垂直
+          [1, 1],   // 正对角线
+          [1, -1]   // 反对角线
+        ];
+        
+        for (const [dx, dy] of directions) {
+          let count = 1;
+          
+          // 向一个方向检查
+          for (let i = 1; i < WIN_COUNT; i++) {
+            const nx = x + dx * i;
+            const ny = y + dy * i;
+            
+            if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE || board[nx][ny] !== currentPlayer) {
+              break;
+            }
+            count++;
+          }
+          
+          // 向相反方向检查
+          for (let i = 1; i < WIN_COUNT; i++) {
+            const nx = x - dx * i;
+            const ny = y - dy * i;
+            
+            if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE || board[nx][ny] !== currentPlayer) {
+              break;
+            }
+            count++;
+          }
+          
+          if (count >= WIN_COUNT) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+
+      // 落子处理
+      const handleClick = (x, y) => {
+        // 如果游戏已结束或该位置已有棋子，则不处理点击
+        if (!gameActive || board[x][y]) {
+          return;
+        }
+        
+        // 创建新的棋盘状态
+        const newBoard = [...board.map(row => [...row])];
+        const currentPlayer = isBlackTurn ? 'black' : 'white';
+        newBoard[x][y] = currentPlayer;
+        
+        // 检查是否获胜
+        if (checkWinner(newBoard, x, y, currentPlayer)) {
+          setWinner(currentPlayer);
+          setGameActive(false);
+        }
+        
+        // 更新状态
+        setBoard(newBoard);
+        setIsBlackTurn(!isBlackTurn);
+      };
+
+      // 重新开始游戏
+      const restartGame = () => {
+        setBoard(Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null)));
+        setIsBlackTurn(true);
+        setWinner(null);
+        setGameActive(true);
+      };
+
+      // 状态显示信息
+      let status;
+      if (winner) {
+        status = `获胜者: ${winner === 'black' ? '黑棋' : '白棋'}`;
+      } else {
+        status = `当前玩家: ${isBlackTurn ? '黑棋' : '白棋'}`;
+      }
+
+      return (
+        <div className="game-container">
+          <h1>五子棋游戏</h1>
+          <div className="status">{status}</div>
+          <div className="board">
+            {board.map((row, x) =>
+              row.map((cell, y) => (
+                <Intersection
+                  key={`${x}-${y}`}
+                  x={x}
+                  y={y}
+                  value={cell}
+                  onClick={handleClick}
+                />
+              ))
+            )}
+          </div>
+          <button className="restart-btn" onClick={restartGame}>重新开始</button>
+        </div>
+      );
+    };
+
+    // 渲染应用
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<GomokuGame />);
+  </script>
+</body>
+</html>
+
