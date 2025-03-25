@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Modal Dialog</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-dialog {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .primary-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .secondary-button {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .open-modal-button {
+            background-color: #2196F3;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .main-content {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // 弹出对话框组件
+        const Modal = ({ isOpen, onClose, onConfirm }) => {
+            // 如果对话框未打开，不渲染任何内容
+            if (!isOpen) return null;
+            
+            const [inputValue, setInputValue] = React.useState('');
+            
+            // 处理确认按钮点击事件
+            const handleConfirm = () => {
+                onConfirm(inputValue);
+                setInputValue('');
+            };
+            
+            // 处理取消按钮点击事件
+            const handleCancel = () => {
+                onClose();
+                setInputValue('');
+            };
+            
+            // 处理输入框变更事件
+            const handleInputChange = (e) => {
+                setInputValue(e.target.value);
+            };
+            
+            return (
+                <div className="modal-overlay">
+                    <div className="modal-dialog">
+                        <div className="modal-header">请输入信息</div>
+                        <input 
+                            type="text" 
+                            className="modal-input" 
+                            value={inputValue} 
+                            onChange={handleInputChange} 
+                            placeholder="请在此输入内容..." 
+                            autoFocus 
+                        />
+                        <div className="modal-footer">
+                            <button onClick={handleCancel} className="secondary-button">取消</button>
+                            <button onClick={handleConfirm} className="primary-button">确认</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 主应用组件
+        const App = () => {
+            const [isModalOpen, setIsModalOpen] = React.useState(false);
+            const [result, setResult] = React.useState('');
+            
+            // 打开对话框
+            const openModal = () => {
+                setIsModalOpen(true);
+            };
+            
+            // 关闭对话框
+            const closeModal = () => {
+                setIsModalOpen(false);
+            };
+            
+            // 处理确认操作
+            const handleConfirm = (value) => {
+                setResult(`您输入的内容是: ${value}`);
+                closeModal();
+            };
+            
+            return (
+                <div>
+                    <h1>React 弹出式对话框示例</h1>
+                    <div className="main-content">
+                        <p>这是主界面内容。当对话框打开时，主界面将被锁定，无法操作。</p>
+                        {result && <p className="result">{result}</p>}
+                    </div>
+                    <button onClick={openModal} className="open-modal-button">打开对话框</button>
+                    
+                    <Modal 
+                        isOpen={isModalOpen} 
+                        onClose={closeModal} 
+                        onConfirm={handleConfirm} 
+                    />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
