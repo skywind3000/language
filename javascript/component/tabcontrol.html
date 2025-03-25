@@ -16,40 +16,28 @@
             const {useState, useEffect} = React;
 
             function TabControl2({ index = 0, children, ... restProps }) {
-                const childrenArray = React.Children.toArray(children);
-                const childToRender = childrenArray[index] || null;
-                return (
+                const display = (children && 
+                    (Array.isArray(children)? children[index]: children)) ||
+                    null;
+                return (<>
                     <div {...restProps}>
-                        {childToRender}
+                        {display || null}
                     </div>
-                );
+                </>);
             }
 
-            function TabControl(props) {
-                const index = ('index' in props)? props.index : 0;
-                let attribs = {};
-                let children = [];
-                for (let key in props) {
-                    if (key === 'index' || key === 'children') {
-                        continue;
-                    }
-                    attribs[key] = props[key];
-                }
-                if ('children' in props) {
-                    const cc = props.children;
-                    if (cc !== undefined && cc !== null) {
-                        if (Array.isArray(cc)) {
-                            if (index >= 0 && index < cc.length) {
-                                children = [cc[index]];
-                            }
-                        } else {
-                            children = [cc];
-                        }
+            function TabControl({ index = 0, children, ...attribs }) {
+                let display = null;
+                if (children) {
+                    if (Array.isArray(children)) {
+                        display = children[index] || null;
+                    } else {
+                        display = children;
                     }
                 }
                 return (<>
                     <div {...attribs}>
-                        {children}
+                        {display}
                     </div>
                 </>);
             }
@@ -68,12 +56,12 @@
                         <button onClick={() => setIndex(2)}>3</button>
                         <button onClick={() => setIndex(3)}>4</button>
                     </div>
-                    <TabControl2 index={index} style={style}>
+                    <TabControl index={index} style={style}>
                         <div>Tab 1</div>
                         <div>Tab 2</div>
                         <div>Tab 3</div>
                         <div>Tab 4</div>
-                    </TabControl2>
+                    </TabControl>
                     <TabControl2 index={index} style={style}/>
                     </>);
             }
