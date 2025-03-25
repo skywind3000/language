@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+
+            const {useState, useEffect} = React;
+
+            function TabControl2({ index = 0, children, ... restProps }) {
+                const childrenArray = React.Children.toArray(children);
+                const childToRender = childrenArray[index] || null;
+                return (
+                    <div {...restProps}>
+                        {childToRender}
+                    </div>
+                );
+            }
+
+            function TabControl(props) {
+                const index = ('index' in props)? props.index : 0;
+                let attribs = {};
+                let children = [];
+                for (let key in props) {
+                    if (key === 'index' || key === 'children') {
+                        continue;
+                    }
+                    attribs[key] = props[key];
+                }
+                if ('children' in props) {
+                    const cc = props.children;
+                    if (cc !== undefined && cc !== null) {
+                        if (Array.isArray(cc)) {
+                            if (index >= 0 && index < cc.length) {
+                                children = [cc[index]];
+                            }
+                        } else {
+                            children = [cc];
+                        }
+                    }
+                }
+                return (<>
+                    <div {...attribs}>
+                        {children}
+                    </div>
+                </>);
+            }
+
+            function TestTab() {
+                const [index, setIndex] = useState(0);
+                const style = {
+                    border: '1px solid black',
+                    padding: '10px',
+                    margin: '10px'
+                };
+                return (<>
+                    <div>
+                        <button onClick={() => setIndex(0)}>1</button>
+                        <button onClick={() => setIndex(1)}>2</button>
+                        <button onClick={() => setIndex(2)}>3</button>
+                        <button onClick={() => setIndex(3)}>4</button>
+                    </div>
+                    <TabControl2 index={index} style={style}>
+                        <div>Tab 1</div>
+                        <div>Tab 2</div>
+                        <div>Tab 3</div>
+                        <div>Tab 4</div>
+                    </TabControl2>
+                    <TabControl2 index={index} style={style}/>
+                    </>);
+            }
+
+            function MyApp() {
+                return (<>
+                    <div>Click button to switch tabs:</div>
+                    <TestTab />
+                </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<React.StrictMode><MyApp /></React.StrictMode>);
+
+        </script>
+    </body>
+
+</html>
+
+
