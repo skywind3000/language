@@ -26,7 +26,7 @@
                 </>);
             }
 
-            function TabControl({ index = 0, children, ...attribs }) {
+            function TabControl({ index = 0, children, ...rest }) {
                 let display = null;
                 if (children) {
                     if (Array.isArray(children)) {
@@ -36,7 +36,7 @@
                     }
                 }
                 return (<>
-                    <div {...attribs}>
+                    <div {...rest}>
                         {display}
                     </div>
                 </>);
@@ -55,6 +55,7 @@
                         <button onClick={() => setIndex(1)}>2</button>
                         <button onClick={() => setIndex(2)}>3</button>
                         <button onClick={() => setIndex(3)}>4</button>
+                        <button onClick={() => setIndex(-1)}>X</button>
                     </div>
                     <TabControl index={index} style={style}>
                         <div>Tab 1</div>
