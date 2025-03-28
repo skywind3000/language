@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>React Start</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel" data-type="module">
+
+            import * as module from './module.js';
+
+            const {useState, useEffect} = React;
+
+            module.demo();
+
+            function MyApp() {
+                return (<>
+                    Hello World!
+                </>);
+            }
+
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            root.render(<React.StrictMode><MyApp /></React.StrictMode>);
+
+        </script>
+    </body>
+
+</html>
+
+
