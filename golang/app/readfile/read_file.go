@@ -18,5 +18,3 @@ func main() {
 	count := words.CountWords(text)
 	fmt.Printf("There are %d words in the text.\n", count)
 }
-
-
