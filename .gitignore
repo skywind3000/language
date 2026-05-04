@@ -75,3 +75,8 @@ tags
 vendor/*
 vendor/
 
+/.vscode/*
+/.claude/*
+/.opencode/*
+/.qoder/*
+nul
